@@ -1,12 +1,15 @@
 module Direction
   class Delta
-    def initialize(method, *args)
-      @method = method.to_sym
+    attr_reader :subject, :definition, :args
+
+    def initialize(subject, definition, *args)
+      @subject = subject
+      @definition = definition
       @args = args
     end
 
-    def apply(property, value)
-      property.alteration(@method).apply value, *@args
+    def apply(value)
+      @subject.instance_exec value, *@args, &@definition.body
     end
   end
 end

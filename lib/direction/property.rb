@@ -9,44 +9,34 @@ module Direction
       @value = nil
     end
 
-    # directive :set do |value|
-    #   @value = value
-    # end
-
-    # directive :+ do |value|
-    #   @value = @value + value
-    # end
-
-    # directive :<< do |value|
-    #   puts "directive <<"
-    #   puts caller
-    #   @value << value
-    # end
-
-    def alteration(name)
-      unless definition = self.class.instance_alteration(name)
-        raise "No alteration definition for #{name}"
+    def delta(name, *args)
+      unless definition = self.class.instance_delta(name)
+        raise "No delta definition for #{name}"
       end
-      Alteration.new self, definition
+      Delta.new self, definition, *args
     end
 
-    def self.alteration(name, &body)
-      instance_alterations[name] = AlterationDefinition.new &body
+    def self.delta(name, &body)
+      instance_deltas[name] = DeltaDefinition.new &body
     end
 
-    def self.instance_alteration(name)
-      instance_alterations[name]
+    def self.instance_delta(name)
+      instance_deltas[name]
     end
 
-    def self.instance_alterations
-      @instance_alterations ||= {}
+    def self.instance_deltas
+      @instance_deltas ||= {}
     end
 
-    alteration :set do |value, new_value|
+    delta :+ do |value, to_add|
+      value + to_add
+    end
+
+    delta :set do |value, new_value|
       new_value
     end
 
-    alteration :<< do |value, to_add|
+    delta :<< do |value, to_add|
       value << to_add
     end
 
@@ -55,12 +45,12 @@ module Direction
     end
 
     def alter(method, *args)
-      deltas << Delta.new(method, *args)
+      deltas << delta(method, *args)
     end
 
     def value
       deltas.inject nil do |value, delta|
-        delta.apply self, value
+        delta.apply value
       end
     end
   end

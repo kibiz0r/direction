@@ -1,5 +1,5 @@
 module Direction
-  class AlterationDefinition
+  class DeltaDefinition
     attr_reader :body
 
     def initialize(&body)
