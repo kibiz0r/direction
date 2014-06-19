@@ -13,13 +13,14 @@ class Object
     end
   end
 
-  def enact_directive(name, *args)
-    unless definition = self.class.instance_directive(name)
-      raise "No directive definition for #{name}"
-    end
-    directive = Direction::Directive.new self, definition, *args
-    directives << directive
-    directive.apply
+  def directive_enact(name, *args)
+    # send name, *args
+    # unless definition = self.class.instance_directive(name)
+    #   raise "No directive definition for #{name}"
+    # end
+    Directive.enact self, name, *args
+    # directives << directive
+    # directive.apply
   end
 
   def directives
@@ -47,5 +48,29 @@ class Object
 
   def property_get(name)
     property(name).value
+  end
+
+  def delta_apply(name, *args)
+    unless definition = self.class.instance_delta(name)
+      raise "#{self.class} has no delta definition for #{name}"
+    end
+    instance_exec *args, &definition
+  end
+
+  delta :set do |value|
+    value
+  end
+
+  [
+    :+,
+    :-,
+    :*,
+    :/,
+    :%,
+    :<<
+  ].each do |operator|
+    delta operator do |value|
+      self.send operator, value
+    end
   end
 end

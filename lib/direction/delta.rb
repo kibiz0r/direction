@@ -1,15 +1,18 @@
 module Direction
   class Delta
-    attr_reader :subject, :definition, :args
+    attr_reader :subject, :name, :args
 
-    def initialize(subject, definition, *args)
+    def initialize(subject, name, *args)
       @subject = subject
-      @definition = definition
+      @name = name
       @args = args
     end
 
-    def apply(value)
-      @subject.instance_exec value, *@args, &@definition.body
+    def ==(other)
+      other.is_a?(Delta) &&
+        self.subject == other.subject &&
+        self.name == other.name &&
+        self.args == other.args
     end
   end
 end

@@ -6,38 +6,6 @@ module Direction
       @subject = subject
       @name = name
       @deltas = []
-      @value = nil
-    end
-
-    def delta(name, *args)
-      unless definition = self.class.instance_delta(name)
-        raise "No delta definition for #{name}"
-      end
-      Delta.new self, definition, *args
-    end
-
-    def self.delta(name, &body)
-      instance_deltas[name] = DeltaDefinition.new &body
-    end
-
-    def self.instance_delta(name)
-      instance_deltas[name]
-    end
-
-    def self.instance_deltas
-      @instance_deltas ||= {}
-    end
-
-    delta :+ do |value, to_add|
-      value + to_add
-    end
-
-    delta :set do |value, new_value|
-      new_value
-    end
-
-    delta :<< do |value, to_add|
-      value << to_add
     end
 
     def set(value)
@@ -45,12 +13,15 @@ module Direction
     end
 
     def alter(method, *args)
-      deltas << delta(method, *args)
+      Delta.new(self, method, *args).tap do |delta|
+        @deltas << delta
+        Directive.current.deltas << delta
+      end
     end
 
     def value
       deltas.inject nil do |value, delta|
-        delta.apply value
+        value.delta_apply delta.name, *delta.args
       end
     end
   end
