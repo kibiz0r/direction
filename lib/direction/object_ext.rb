@@ -77,8 +77,13 @@ class Object
   end
 
   # Nope, this ends up being really awkward.
+  #
   # Maybe store deltas per property, so that there isn't this implicit protocol
   # hidden in the args of :prop_altered deltas.
+  #
+  # The other alternative I entertained was including properties in the delta
+  # prototype, so a delta could be either :set or [:foo, :set], but that also
+  # seems weird.
   delta! :prop_altered do |property_name, delta_name, *args|
     ivar = :"@#{property_name}"
     value = instance_variable_get ivar
