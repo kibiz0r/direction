@@ -84,6 +84,11 @@ class Object
   # The other alternative I entertained was including properties in the delta
   # prototype, so a delta could be either :set or [:foo, :set], but that also
   # seems weird.
+  #
+  # After thinking about it, specifying the property in the prototype seems
+  # best. It's sort of like defining a method like foo=. The data is being
+  # stored on self, so it makes sense that self gets the chance to define how
+  # it is altered.
   delta! :prop_altered do |property_name, delta_name, *args|
     ivar = :"@#{property_name}"
     value = instance_variable_get ivar
