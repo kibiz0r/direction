@@ -18,7 +18,7 @@ class Object
     # unless definition = self.class.instance_directive(name)
     #   raise "No directive definition for #{name}"
     # end
-    Directive.enact self, name, *args
+    Direction::Directive.enact self, name, *args
     # directives << directive
     # directive.apply
   end
@@ -37,17 +37,30 @@ class Object
   end
 
   def property_set(name, value)
-    # Equivalent to:
-    #   property_alter name, :set, value
-    property(name).set value
+    property_alter name, :set, value
   end
 
-  def property_alter(name, method, *args)
-    property(name).alter method, *args
+  def property_alter(name, delta_name, *args)
+    delta_push :prop_altered, name.to_sym, delta_name, *args
   end
 
   def property_get(name)
-    property(name).value
+    instance_variable_get :"@#{name}"
+    # property_deltas(name).inject nil do |value, delta|
+    #   delta = Delta.new delta.name, *delta.args
+    #   value.delta_apply delta
+    # end
+  end
+
+  def property_deltas(name)
+    deltas.select do |delta|
+      delta.name == :prop_altered &&
+        delta.args[0] == name
+    end
+  end
+
+  def deltas
+    @deltas ||= []
   end
 
   def delta_apply(name, *args)
@@ -55,6 +68,22 @@ class Object
       raise "#{self.class} has no delta definition for #{name}"
     end
     instance_exec *args, &definition
+  end
+
+  def delta_push(name, *args)
+    delta = Direction::Delta.new name, *args
+    deltas << delta
+    delta_apply name, *args
+  end
+
+  # Nope, this ends up being really awkward.
+  # Maybe store deltas per property, so that there isn't this implicit protocol
+  # hidden in the args of :prop_altered deltas.
+  delta! :prop_altered do |property_name, delta_name, *args|
+    ivar = :"@#{property_name}"
+    value = instance_variable_get ivar
+    new_value = value.delta_apply delta_name, *args
+    instance_variable_set ivar, new_value
   end
 
   delta :set do |value|

@@ -5,8 +5,8 @@ module Direction
       @property_name = property_name
     end
 
-    def method_missing(method, *args, &block)
-      @subject.property_alter @property_name, method, *args
+    def method_missing(delta_name, *args)
+      @subject.property_alter @property_name, delta_name, *args
     end
   end
 end

@@ -18,9 +18,15 @@ class Class
     end
   end
 
-  def directive(name, &body)
+  def directive(prototype, &body)
+    if prototype.is_a? Hash
+      name, delta_name = prototype.first
+    else
+      name = prototype
+    end
     name = name.to_sym
     instance_directives[name] = body
+    define_method name, &body
   end
 
   def instance_directive(name)
@@ -42,7 +48,16 @@ class Class
     @instance_properties || []
   end
 
+  # #delta means that you intend to return a new value as the result of the delta.
+  # This implies that this delta must be stored on a property.
   def delta(name, &body)
+    name = name.to_sym
+    instance_deltas[name] = body
+  end
+
+  # #delta! means that you intend to mutate self in order to apply the delta.
+  # This implies that this delta must be stored on self.
+  def delta!(name, &body)
     name = name.to_sym
     instance_deltas[name] = body
   end

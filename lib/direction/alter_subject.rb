@@ -7,10 +7,15 @@ module Direction
     def method_missing(method, *args, &block)
       method = method.to_s
       property_name = method.chomp "="
-      if method.end_with? "="
-        @subject.property_set property_name, *args
+
+      if property = @subject.property(property_name)
+        if method.end_with? "="
+          @subject.property_set property_name, *args
+        else
+          AlterProperty.new @subject, property_name
+        end
       else
-        AlterProperty.new @subject, property_name
+        @subject.delta_push method, *args
       end
     end
   end
