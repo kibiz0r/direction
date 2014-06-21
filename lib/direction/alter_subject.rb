@@ -4,18 +4,26 @@ module Direction
       @subject = subject
     end
 
-    def method_missing(method, *args, &block)
+    def method_missing(method, *args)
       method = method.to_s
-      property_name = method.chomp "="
 
-      if property = @subject.property(property_name)
+      if method.end_with? "="
+        property_name = method.chomp "="
+        prototype = [property_name, :set]
+      else
+        prototype = method
+      end
+
+      if @subject.applies_delta? prototype
+        @subject.delta_push prototype, *args
+      elsif @subject.respond_to? method
         if method.end_with? "="
-          @subject.property_set property_name, *args
+          raise "No delta #{prototype} on #@subject"
         else
-          AlterProperty.new @subject, property_name
+          AlterProperty.new @subject, method
         end
       else
-        @subject.delta_push method, *args
+        raise "No delta #{prototype} or method #{method} on #@subject"
       end
     end
   end

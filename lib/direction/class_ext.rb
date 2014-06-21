@@ -62,7 +62,16 @@ class Class
     instance_deltas[name] = body
   end
 
-  def instance_delta(name)
+  def delta_defined?(name)
+    !instance_delta(name).nil?
+  end
+
+  def instance_delta(prototype)
+    if prototype.is_a? Array
+      return nil
+    else
+      name = prototype
+    end
     name = name.to_sym
     instance_delta = instance_deltas[name]
 
