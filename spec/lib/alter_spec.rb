@@ -109,6 +109,12 @@ describe "alter" do
 
   # I'm not sure about this whole "intercepting properties" business...
   #
+  # The type of delta is supposed to be dependent on the current value of the
+  # property.
+  #
+  # On the other hand, the delta is stored and applied on the subject. So
+  # it seems like a pretty natural feature.
+  #
   # describe ".my_intercepted_property.my_property_delta" do
   #   let :my_class do
   #     Class.new do
