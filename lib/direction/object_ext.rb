@@ -45,9 +45,9 @@ class Object
     subject.instance_exec *args, &definition
   end
 
-  # def enact(subject = self)
-  #   Direction::EnactSubject.new subject
-  # end
+  def enact(subject = self)
+    Direction::EnactSubject.new subject
+  end
 
   # def directive_enact(name, *args)
   #   # send name, *args

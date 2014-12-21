@@ -29,22 +29,14 @@ describe "alter" do
   end
 
   describe ".my_pure_delta" do
-    let :my_class do
-      Class.new do
-        attr_reader :my_attr
-
-        delta :my_pure_delta do
-          raise "shouldn't be allowed"
-        end
-      end
-    end
-
     subject do
-      my_class.new
+      7
     end
 
-    it "can't be called without a subject to store it on" do
-      alter(subject).my_pure_delta
+    it "returns the applied value of the delta" do
+      # This won't be stored in subject's history
+      return_value = alter(subject) + 5
+      expect(return_value).to eq(12)
     end
   end
 

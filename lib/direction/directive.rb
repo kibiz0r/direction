@@ -1,16 +1,27 @@
 module Direction
   class Directive
-    attr_reader :subject, :name, :args, :deltas
+    attr_reader :name, :args
 
-    def initialize(subject, name, *args)
-      @subject = subject
+    def initialize(name, *args)
       @name = name
       @args = args
-      @deltas = []
+    end
+
+    def return_value
+    end
+
+    def deltas
+      []
     end
 
     def apply
       subject.send name, *args
+    end
+
+    def ==(other)
+      other.is_a?(Directive) &&
+        self.name == other.name &&
+        self.args == other.args
     end
 
     def self.enact(subject, name, *args)

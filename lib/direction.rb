@@ -3,6 +3,7 @@ require "direction/directive_definition"
 require "direction/directive"
 require "direction/delta_definition"
 require "direction/delta"
+require "direction/delta_set"
 
 require "direction/class_ext"
 require "direction/object_ext"
