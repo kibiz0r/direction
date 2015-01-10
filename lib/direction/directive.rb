@@ -1,13 +1,24 @@
 module Direction
   class Directive
     attr_reader :name, :args
+    attr_accessor :value
 
-    def initialize(name, *args)
+    def initialize(target, name, *args)
+      if target.is_a? Class
+        @type = target
+      else
+        @id = target.object_id
+      end
       @name = name
       @args = args
     end
 
-    def return_value
+    def target
+      if @id
+        ObjectSpace._id2ref @id
+      elsif @type
+        @type
+      end
     end
 
     def deltas

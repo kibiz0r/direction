@@ -1,4 +1,14 @@
 class Object
+  include Direction
+
+  def timeline
+    @timeline ||= Direction::Timeline.new self
+  end
+
+  def object_history
+    @object_history ||= Direction::ObjectHistory.new timeline
+  end
+
   def alter(subject = self)
     alter_subject = Direction::AlterSubject.new subject
     if block_given?
@@ -46,7 +56,11 @@ class Object
   end
 
   def enact(subject = self)
-    Direction::EnactSubject.new subject
+    timeline.enact subject
+  end
+
+  def directive_enact(timeline, name, *args)
+    timeline.directive_enact self, name, *args
   end
 
   # def directive_enact(name, *args)

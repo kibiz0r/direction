@@ -1,12 +1,12 @@
 module Direction
   class EnactSubject
-    def initialize(subject)
+    def initialize(timeline, subject)
+      @timeline = timeline
       @subject = subject
     end
 
     def method_missing(method, *args)
-      Directive.new method, *args
-      # @subject.directive_enact method, *args
+      @subject.directive_enact @timeline, method, *args
     end
   end
 end
