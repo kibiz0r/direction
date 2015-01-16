@@ -153,7 +153,7 @@ describe "Calculator Example" do
 
         expect(press_5).to be_a(Directive)
 
-        change = Timeline.changes[2]
+        change = Timeline.changes[1]
         expect(change.name).to eq(:press_5)
 
         change = calculator.object_history.changes[0]
@@ -163,8 +163,6 @@ describe "Calculator Example" do
 
     describe "alter(calculator).display = 123" do
       it "adds a delta for display = 123" do
-        pending
-
         alter(calculator).display = 123
 
         expect(calculator.display).to eq(123)
@@ -181,14 +179,11 @@ describe "Calculator Example" do
       end
 
       describe "in another timeline" do
-        it "raises an exception because calculator is unknown to this timeline" do
-          pending
-
-          expect do
-            Timeline.new do
-              alter(calculator).display = 123
-            end
-          end.to raise_error(TimelineError)
+        it "doesn't apply to the main timeline" do
+          Timeline.new do
+            alter(calculator).display = 123
+          end
+          expect(calculator.display).to eq(nil)
         end
       end
     end
@@ -206,10 +201,8 @@ describe "Calculator Example" do
     end
 
     describe "enact(calculator).press_5" do
-      it "raises an exception because calculator is unknown to this timeline" do
-        break pending
-
-        expect { enact(calculator).press_5 }.to raise_error(TimelineError)
+      it "works?" do
+        enact(calculator).press_5
       end
     end
 
@@ -245,8 +238,6 @@ describe "Calculator Example" do
 
       describe "in another timeline" do
         it "adds a delta for display = 123" do
-          break pending
-
           calculator.alter_display_123
 
           expect(calculator.display).to eq(123)

@@ -1,22 +1,12 @@
 class Object
   include Direction
 
-  def timeline
-    @timeline ||= Direction::Timeline.new self
-  end
-
   def object_history
     @object_history ||= Direction::ObjectHistory.new self
   end
 
   def alter(subject = self)
-    alter_subject = Direction::AlterSubject.new timeline, subject
-    if block_given?
-      yield alter_subject
-      nil
-    else
-      alter_subject
-    end
+    Direction::AlterSubject.new subject
   end
 
   def applies_delta?(prototype)
@@ -29,20 +19,15 @@ class Object
     end
   end
 
-  def deltas
-    @deltas ||= []
-  end
-
-  def delta_push(timeline, prototype, *args)
+  def delta_push(prototype, *args)
     delta = Direction::Delta.new prototype, *args
     delta.target = self
-    deltas << delta
     Timeline.changes << delta
-    delta.value = delta_apply timeline, prototype, *args
+    delta.value = delta_apply prototype, *args
     delta
   end
 
-  def delta_apply(timeline, prototype, *args)
+  def delta_apply(prototype, *args)
     if prototype.is_a? Array
       method = prototype[0]
       subject = send method
@@ -59,15 +44,56 @@ class Object
   end
 
   def enact(subject = self)
-    timeline.enact subject
+    Direction::EnactSubject.new subject
   end
 
   def enact!(subject = self)
-    timeline.enact! subject
+    Direction::EnactValueSubject.new subject
   end
 
-  def directive_enact(timeline, name, *args)
-    timeline.directive_enact self, name, *args
+  def resolve_target(target)
+    # unless known_target? target
+    #   raise TimelineError, "Object #{target.inspect} is unknown to this timeline (#{self.inspect})"
+    # end
+    if target.is_a? Property
+      target.value
+    else
+      target
+    end
+  end
+
+  def resolve_subject(target)
+    # unless known_target? target
+    #   raise TimelineError, "Object #{target.inspect} is unknown to this timeline (#{self.inspect})"
+    # end
+    if target.is_a? Property
+      target.subject
+    else
+      target
+    end
+  end
+
+  def directive_enact(name, *args)
+    resolved_target = resolve_target self
+    resolved_subject = resolve_subject self
+
+    directive = Direction::Directive.new resolved_target, name, *args
+
+    if name.to_s == "new"
+      name = "directionful_new"
+    end
+
+    if self.is_a? Property
+      directive.property_name = self.name
+    end
+
+    directive.initiator = resolved_subject
+
+    Timeline.changes << directive
+
+    directive.value = resolved_target.send name, *args
+
+    directive
   end
 
   def property_get(name)
@@ -105,7 +131,7 @@ class Object
   end
 
   def property_alter(name, delta_name, *args)
-    delta = delta_push timeline, [name.to_sym, delta_name], *args
+    delta = delta_push [name.to_sym, delta_name], *args
     property = instance_variable_get :"@#{name}"
     property.value = delta.value
     delta
