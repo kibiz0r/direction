@@ -1,5 +1,5 @@
 module Direction
-  class AlterProperty
+  class AlterProperty < BasicObject
     def initialize(subject, property_name)
       @subject = subject
       @property_name = property_name
@@ -11,7 +11,7 @@ module Direction
       if @subject.applies_delta? prototype
         @subject.delta_push prototype, *args
       else
-        raise "No delta #{prototype} on #@subject"
+        ::Kernel.raise "No delta #{prototype} on #@subject"
       end
     end
   end

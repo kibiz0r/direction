@@ -6,6 +6,7 @@ Dir["./spec/support/**/*.rb"].each { |f| require f }
 RSpec.configure do |config|
   config.mock_with :rr
   config.before do
-    Timeline.changes.clear
+    Timeline.current.objects.clear
+    Timeline.current.head = nil
   end
 end

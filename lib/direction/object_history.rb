@@ -12,7 +12,9 @@ module Direction
 
     def property_get(name)
       last_change = self.changes.select do |change|
-        change.is_a? Delta and change.property.to_s == name.to_s
+        change.is_a? Delta and
+          change.property.to_s == name.to_s and
+          !change.in_progress
       end.last
       unless last_change.nil?
         last_change.value

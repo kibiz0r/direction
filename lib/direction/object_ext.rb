@@ -21,9 +21,12 @@ class Object
 
   def delta_push(prototype, *args)
     delta = Direction::Delta.new prototype, *args
+    delta.in_progress = true
     delta.target = self
-    Timeline.changes << delta
+    delta.parent = Timeline.head
+    Timeline.commit delta
     delta.value = delta_apply prototype, *args
+    delta.in_progress = false
     delta
   end
 
@@ -87,9 +90,10 @@ class Object
       directive.property_name = self.name
     end
 
+    directive.parent = Timeline.head
     directive.initiator = resolved_subject
 
-    Timeline.changes << directive
+    Timeline.commit directive
 
     directive.value = resolved_target.send name, *args
 
@@ -155,16 +159,16 @@ class Object
     value
   end
 
-  # [
-  #   :+,
-  #   :-,
-  #   :*,
-  #   :/,
-  #   :%,
-  #   :<<
-  # ].each do |operator|
-  #   delta operator do |value|
-  #     self.send operator, value
-  #   end
-  # end
+  [
+    :+,
+    :-,
+    :*,
+    :/,
+    :%,
+    :<<
+  ].each do |operator|
+    delta operator do |value|
+      self.send operator, value
+    end
+  end
 end

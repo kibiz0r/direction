@@ -11,7 +11,9 @@ module Direction
       end
 
       def changes
-        self.current.changes
+        self.stack.inject [] do |changes, timeline|
+          changes + timeline.changes
+        end
       end
 
       def add_object(object)
@@ -29,9 +31,31 @@ module Direction
       def stack
         @stack ||= []
       end
+
+      def branch(&block)
+        self.current.branch &block
+      end
+
+      def merge(timeline)
+        self.current.merge timeline
+      end
+
+      def rebase(timeline)
+        self.current.rebase timeline
+      end
+
+      def commit(change)
+        self.current.commit change
+      end
+
+      def head
+        self.current.head
+      end
     end
 
-    def initialize
+    def initialize(ref = nil)
+      @ref = ref
+
       if block_given?
         begin
           self.class.push self
@@ -61,7 +85,55 @@ module Direction
     end
 
     def changes
-      @changes ||= []
+      ref = self.head
+      changes = []
+      while ref
+        change = self.objects[ref]
+        changes.unshift change
+        ref = change.parent
+      end
+      changes
+    end
+
+    attr_accessor :head
+
+    def branch(&block)
+      Timeline.new head, &block
+    end
+
+    def head_change
+      self.objects[self.head]
+    end
+
+    def merge(timeline)
+      ref = timeline.head
+      changes_to_merge = []
+      while ref
+        break if self.objects.has_key? ref
+        change = timeline.objects[ref]
+        changes_to_merge.unshift change
+        ref = change.parent
+      end
+      duped_changes = changes_to_merge.map &:dup
+      duped_changes.each do |change|
+        self.add_object change
+      end
+      duped_changes.first.parent = self.head
+      self.head = duped_changes.last.id
+      # find common ancestor
+      # aggregate changes on timeline below common ancestor
+      # copy those changes onto self
+      # set first of changes' parent to head
+      # set head to last of changes' id
+    end
+
+    def rebase(timeline)
+    end
+
+    def commit(change)
+      self.add_object change
+      self.head = change.id
+      change
     end
   end
 end

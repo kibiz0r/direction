@@ -250,4 +250,67 @@ describe "Calculator Example" do
       end
     end
   end
+
+  describe "timeline branching" do
+    subject do
+      Calculator.new
+    end
+
+    it "builds upon parent timeline" do
+      alter(subject).display = ""
+      alter(subject).display + "1"
+
+      Timeline.branch do
+        alter(subject).display + "2"
+
+        expect(subject.display).to eq("12")
+      end
+    end
+  end
+
+  describe "timeline merging" do
+    subject do
+      Calculator.new
+    end
+
+    it "combines changes" do
+      alter(subject).display = ""
+      alter(subject).display + "1"
+      to_merge = Timeline.branch do
+        alter(subject).display + "3"
+      end
+      alter(subject).display + "2"
+
+      Timeline.merge to_merge
+
+      # p Timeline.changes.map(&:value)
+
+      Timeline.changes.each_with_index do |change, i|
+        puts "#{i}:"
+        p change
+      end
+      expect(subject.display).to eq("123")
+    end
+  end
+
+  describe "timeline rebasing" do
+    subject do
+      Calculator.new
+    end
+
+    it "combines changes" do
+      alter(subject).display = ""
+      alter(subject).display + "1"
+      to_merge = Timeline.branch do
+        alter(subject).display + "2"
+      end
+      alter(subject).display + "3"
+
+      Timeline.rebase to_merge
+
+      # p Timeline.changes.map(&:value)
+
+      expect(subject.display).to eq("123")
+    end
+  end
 end

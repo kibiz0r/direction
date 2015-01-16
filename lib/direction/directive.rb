@@ -1,7 +1,7 @@
 module Direction
   class Directive
     attr_reader :name, :args
-    attr_accessor :value, :property_name, :initiator
+    attr_accessor :value, :property_name, :initiator, :parent
 
     def initialize(target, name, *args)
       if target.is_a? Class
@@ -11,6 +11,14 @@ module Direction
       end
       @name = name
       @args = args
+    end
+
+    def dup
+      self
+    end
+
+    def id
+      self.object_id
     end
 
     def target

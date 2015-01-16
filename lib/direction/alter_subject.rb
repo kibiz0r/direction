@@ -1,5 +1,5 @@
 module Direction
-  class AlterSubject
+  class AlterSubject < BasicObject
     def initialize(subject)
       @subject = subject
     end
@@ -18,12 +18,12 @@ module Direction
         @subject.delta_push prototype, *args
       elsif @subject.respond_to? method
         if method.end_with? "="
-          raise "No delta #{prototype} on #@subject"
+          ::Kernel.raise "No delta #{prototype} on #@subject"
         else
           AlterProperty.new @subject, method
         end
       else
-        raise "No delta #{prototype} or method #{method} on #@subject"
+        ::Kernel.raise "No delta #{prototype} or method #{method} on #@subject"
       end
     end
   end
