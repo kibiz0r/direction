@@ -1,6 +1,7 @@
 module Direction
   class AlterProperty
-    def initialize(subject, property_name)
+    def initialize(timeline, subject, property_name)
+      @timeline = timeline
       @subject = subject
       @property_name = property_name
     end
@@ -9,7 +10,7 @@ module Direction
       prototype = [@property_name, method]
 
       if @subject.applies_delta? prototype
-        @subject.delta_push prototype, *args
+        @subject.delta_push timeline, prototype, *args
       else
         raise "No delta #{prototype} on #@subject"
       end

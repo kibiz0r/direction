@@ -1,7 +1,7 @@
 module Direction
   class Directive
     attr_reader :name, :args
-    attr_accessor :value
+    attr_accessor :value, :property_name, :initiator
 
     def initialize(target, name, *args)
       if target.is_a? Class

@@ -1,6 +1,7 @@
 module Direction
   class AlterSubject
-    def initialize(subject)
+    def initialize(timeline, subject)
+      @timeline = timeline
       @subject = subject
     end
 
@@ -15,12 +16,12 @@ module Direction
       end
 
       if @subject.applies_delta? prototype
-        @subject.delta_push prototype, *args
+        @subject.delta_push @timeline, prototype, *args
       elsif @subject.respond_to? method
         if method.end_with? "="
           raise "No delta #{prototype} on #@subject"
         else
-          AlterProperty.new @subject, method
+          AlterProperty.new @timeline, @subject, method
         end
       else
         raise "No delta #{prototype} or method #{method} on #@subject"

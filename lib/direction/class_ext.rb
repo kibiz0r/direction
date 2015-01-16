@@ -13,6 +13,7 @@ class Class
       end
 
       define_method setter do |value|
+        instance_variable_set ivar, Property.new(self, name)
         property_set name, value
       end
     end

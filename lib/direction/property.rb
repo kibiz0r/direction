@@ -1,5 +1,8 @@
 module Direction
   class Property
+    attr_reader :subject, :name
+    attr_accessor :value
+
     def initialize(subject, name)
       @subject = subject
       @name = name

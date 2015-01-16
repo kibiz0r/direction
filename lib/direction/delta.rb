@@ -1,6 +1,7 @@
 module Direction
   class Delta
     attr_reader :prototype, :args
+    attr_accessor :value, :target
 
     def initialize(prototype, *args)
       if prototype.is_a? Array
@@ -10,6 +11,10 @@ module Direction
       end
       @prototype = prototype
       @args = args
+    end
+
+    def initiator
+      self.target
     end
 
     def property
