@@ -2,7 +2,11 @@ class Object
   include Direction
 
   def object_history
-    @object_history ||= Direction::ObjectHistory.new self
+    object_history = Direction::ObjectHistory.new self
+    define_singleton_method :object_history do
+      object_history
+    end
+    object_history
   end
 
   def alter(subject = self)
@@ -19,15 +23,31 @@ class Object
     end
   end
 
-  def delta_push(prototype, *args)
-    delta = Direction::Delta.new prototype, *args
-    delta.in_progress = true
-    delta.target = self
-    delta.parent = Timeline.head
-    Timeline.commit delta
-    delta.value = delta_apply prototype, *args
-    delta.in_progress = false
+  def delta_push(property, name, *args)
+    change = Change.new Timeline.head,
+      self,
+      property,
+      :delta,
+      name,
+      *args
+
+    Timeline.commit change
+
+    delta = Direction::Delta.new change
+    # delta.in_progress = true
+    # delta.target = self
+    # delta.parent = Timeline.head
+    # delta.value = delta_apply prototype, *args
+    # delta.in_progress = false
+
     delta
+  end
+
+  def delta_invoke(name, *args)
+    unless definition = self.class.instance_delta(name)
+      raise "#{self.class} has no delta definition for #{name}"
+    end
+    self.instance_exec *args, &definition
   end
 
   def delta_apply(prototype, *args)
@@ -76,8 +96,37 @@ class Object
     end
   end
 
+  def directive_push(name, *args)
+    if name.to_s == "new"
+      name = "directionful_new"
+    end
+
+    change = Change.new Timeline.head,
+      self,
+      nil,
+      :directive,
+      name,
+      *args
+
+    Timeline.commit change
+
+    directive = Direction::Directive.new change
+
+    # if self.is_a? Property
+    #   directive.property_name = self.name
+    # end
+
+    # directive.parent = Timeline.head
+    # directive.initiator = resolved_subject
+
+    # directive.value = resolved_target.send name, *args
+
+    directive
+  end
+
   def directive_enact(name, *args)
-    resolved_target = resolve_target self
+    # resolved_target = resolve_target self
+    resolved_target = self
     resolved_subject = resolve_subject self
 
     directive = Direction::Directive.new resolved_target, name, *args
@@ -135,9 +184,9 @@ class Object
   end
 
   def property_alter(name, delta_name, *args)
-    delta = delta_push [name.to_sym, delta_name], *args
-    property = instance_variable_get :"@#{name}"
-    property.value = delta.value
+    delta = delta_push name.to_sym, delta_name, *args
+    # property = instance_variable_get :"@#{name}"
+    # property.value = delta.value
     delta
   end
 

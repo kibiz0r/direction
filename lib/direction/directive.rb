@@ -1,16 +1,13 @@
 module Direction
   class Directive
-    attr_reader :name, :args
-    attr_accessor :value, :property_name, :initiator, :parent
+    attr_reader :change
 
-    def initialize(target, name, *args)
-      if target.is_a? Class
-        @type = target
-      else
-        @id = target.object_id
-      end
-      @name = name
-      @args = args
+    def initialize(change)
+      @change = change
+    end
+
+    def value
+      @change.object
     end
 
     def dup

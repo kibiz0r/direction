@@ -5,7 +5,8 @@ module Direction
     end
 
     def method_missing(method, *args)
-      @subject.directive_enact method, *args
+      @subject.directive_push method, *args
+      # @subject.directive_enact method, *args
     end
   end
 
@@ -15,7 +16,8 @@ module Direction
     end
 
     def method_missing(method, *args)
-      @subject.directive_enact(method, *args).value
+      @subject.directive_push(method, *args).value
+      # @subject.directive_enact(method, *args).value
     end
   end
 end

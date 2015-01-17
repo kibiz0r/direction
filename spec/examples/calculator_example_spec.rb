@@ -37,6 +37,9 @@ describe "Calculator Example" do
     prop_accessor :calculator
 
     def initialize
+      # FIXME
+      # This will cause infinite recursion, because this enact! happens
+      # within the enact!.new of this class
       self.calculator = enact!(Calculator).new
       # @calculator = Property(Calculator).new
     end
@@ -54,7 +57,10 @@ describe "Calculator Example" do
 
   describe "CalculatorPropertyController.new" do
     subject do
-      CalculatorPropertyController.new
+      enact!(CalculatorPropertyController).new
+      # Should be:
+      # CalculatorPropertyController.new
+      # ...but right now, everything must be hung off of constants
     end
 
     let :calculator do
@@ -66,8 +72,22 @@ describe "Calculator Example" do
         subject.do_press_5
 
         change = calculator.object_history.changes[0]
+        expect(change.name).to eq(:new)
+        expect(change.target).to eq(Calculator)
+
+        change = calculator.object_history.changes[1]
         expect(change.name).to eq(:press_5)
         expect(change.target).to eq(calculator)
+
+        change = subject.object_history.changes[0]
+        expect(change.name).to eq(:set)
+        expect(change.property).to eq(:calculator)
+        expect(change.args).to eq([calculator])
+
+        Timeline.changes.each do |change|
+          p change
+          p change.target
+        end
 
         change = subject.object_history.changes[1]
         expect(change.name).to eq(:press_5)
@@ -283,12 +303,6 @@ describe "Calculator Example" do
 
       Timeline.merge to_merge
 
-      # p Timeline.changes.map(&:value)
-
-      Timeline.changes.each_with_index do |change, i|
-        puts "#{i}:"
-        p change
-      end
       expect(subject.display).to eq("123")
     end
   end

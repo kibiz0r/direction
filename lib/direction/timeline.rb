@@ -51,6 +51,18 @@ module Direction
       def head
         self.current.head
       end
+      
+      def delta_value(delta_id)
+        self.current.delta_value delta_id
+      end
+
+      def find_change(timeline_object_id)
+        self.current.find_change timeline_object_id
+      end
+
+      def find_object(timeline_object_id)
+        self.current.find_object timeline_object_id
+      end
     end
 
     def initialize(ref = nil)
@@ -74,14 +86,51 @@ module Direction
       "timeline~#{@owner.inspect}#{objects.inspect}"
     end
 
-    def add_object(object)
-      unless object.is_a? Class
-        objects[object.object_id] = object
+    def add_change(change)
+      self.change_graph[change.id] = change
+    end
+
+    def find_change(change_id)
+      self.change_graph[change_id]
+    end
+
+    def find_object(change_id)
+      self.find_snapshot(change_id).find_object change_id
+    end
+
+    def find_snapshot(change_id)
+      changes = changes_up_to change_id
+      changes.inject Snapshot.new do |snapshot, change|
+        object = run_change change
+        snapshot.add_object change, object
       end
     end
 
-    def objects
-      @objects ||= {}
+    def run_change(change)
+      puts "run_change"
+      p change
+      binding.pry
+      case change.type
+      when :directive
+        change.target.send change.name, *change.args
+      when :delta
+      else
+        raise "Invalid type: #{change.type}"
+      end
+    end
+
+    def change_graph
+      @change_graph ||= {}
+    end
+
+    def changes_up_to(change_id)
+      change = find_change change_id
+      changes = []
+      while change
+        changes.unshift change
+        change = change.parent
+      end
+      changes
     end
 
     def changes
@@ -95,14 +144,24 @@ module Direction
       changes
     end
 
-    attr_accessor :head
+    attr_accessor :head_id
+
+    def delta_value(delta_id)
+      changes.inject changes.first.target do |value, change|
+        if change.is_a? Delta
+          value.delta_invoke change.name, *change.args
+        else
+          value
+        end
+      end
+    end
 
     def branch(&block)
       Timeline.new head, &block
     end
 
-    def head_change
-      self.objects[self.head]
+    def head
+      self.find_change self.head_id
     end
 
     def merge(timeline)
@@ -110,13 +169,13 @@ module Direction
       changes_to_merge = []
       while ref
         break if self.objects.has_key? ref
-        change = timeline.objects[ref]
+        change = timeline.change_graph[ref]
         changes_to_merge.unshift change
         ref = change.parent
       end
       duped_changes = changes_to_merge.map &:dup
       duped_changes.each do |change|
-        self.add_object change
+        self.add_change change
       end
       duped_changes.first.parent = self.head
       self.head = duped_changes.last.id
@@ -131,8 +190,8 @@ module Direction
     end
 
     def commit(change)
-      self.add_object change
-      self.head = change.id
+      self.add_change change
+      self.head_id = change.id
       change
     end
   end

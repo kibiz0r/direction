@@ -1,16 +1,25 @@
 module Direction
   class Delta
-    attr_reader :prototype, :args
-    attr_accessor :value, :target, :in_progress, :parent
+    # attr_reader :prototype, :args
+    # attr_accessor :target, :in_progress, :parent
 
-    def initialize(prototype, *args)
-      if prototype.is_a? Array
-        prototype = prototype.map &:to_sym
-      else
-        prototype = prototype.to_sym
-      end
-      @prototype = prototype
-      @args = args
+    def initialize(change)
+      @change = change
+      # if prototype.is_a? Array
+      #   prototype = prototype.map &:to_sym
+      # else
+      #   prototype = prototype.to_sym
+      # end
+      # @prototype = prototype
+      # @args = args
+    end
+
+    def to_timeline_object
+      @change
+    end
+
+    def value
+      Timeline.delta_value self.id
     end
 
     def dup

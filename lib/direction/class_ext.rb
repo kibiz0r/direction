@@ -1,4 +1,8 @@
 class Class
+  def to_timeline_object
+    Direction::TimelineObject.new :constant, self.name
+  end
+
   def prop_accessor(*names)
     names.each do |name|
       name = name.to_sym

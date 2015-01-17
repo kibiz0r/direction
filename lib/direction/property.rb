@@ -1,11 +1,18 @@
 module Direction
   class Property
     attr_reader :subject, :name
-    attr_accessor :value
 
     def initialize(subject, name)
       @subject = subject
       @name = name
+    end
+
+    def value
+      changes = Timeline.changes.select do |change|
+        change.is_a? Delta and
+          change.property == @name
+      end
+      changes.last.value
     end
 # 
 #     def set(value)
