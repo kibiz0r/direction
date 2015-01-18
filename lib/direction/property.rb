@@ -16,6 +16,10 @@ module Direction
       end
       changes.last.value
     end
+
+    def to_timeline_object
+      TimelineProperty.new @subject, @name
+    end
 # 
 #     def set(value)
 #       alter :set, value

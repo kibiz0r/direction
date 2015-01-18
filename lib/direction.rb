@@ -13,6 +13,7 @@ require "direction/timeline_error"
 require "direction/change"
 require "direction/change_set"
 require "direction/timeline_object"
+require "direction/timeline_property"
 require "direction/snapshot"
 
 require "direction/class_ext/directionful_new"

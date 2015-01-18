@@ -27,7 +27,6 @@ class Object
     puts "delta_push"
 
     change = Change.new self,
-      property,
       :delta,
       name,
       *args
@@ -102,16 +101,9 @@ class Object
       name = "directionful_new"
     end
 
-    target, property = if self.is_a? Property
-                         [self.value, self.name]
-                       else
-                         [self, nil]
-                       end
+    puts "Change.new #{self} : #{name}"
 
-    puts "Change.new #{target}:#{property}, #{name}"
-
-    change = Change.new target,
-      property,
+    change = Change.new self,
       :directive,
       name,
       *args

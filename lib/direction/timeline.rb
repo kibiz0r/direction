@@ -114,6 +114,7 @@ module Direction
       change_set = self.find_change_set change_set_id
       Snapshot.run snapshot do
         ChangeSet.run change_set do
+          puts "running #{change_set.initiating_change.description}"
           snapshot.run_change change_set.initiating_change
         end
       end
@@ -194,7 +195,7 @@ module Direction
     end
 
     def commit(change)
-      puts "commit: #{change.type} on #{change.target} : #{change.name}"
+      # puts "commit: #{change.type} on #{change.target} : #{change.name}"
       # binding.pry
 
       if ChangeSet.current?

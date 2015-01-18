@@ -24,6 +24,10 @@ module Direction
       end
     end
 
+    def description
+      "TimelineObject(#{@type}:#{@id})"
+    end
+
     def to_timeline_object
       self
     end

@@ -49,17 +49,20 @@ module Direction
       end
     end
 
-    attr_reader :type, :name, :property, :changes
+    attr_reader :type, :name, :changes
     attr_accessor :change_set_id
 
-    def initialize(target, property, type, name, *args)
+    def initialize(target, type, name, *args)
       @target = target.to_timeline_object
       @object = TimelineObject.new :object, self.id
       @type = type
       @name = name
-      @property = property
       @args = args.map &:to_timeline_object
       @changes = []
+    end
+
+    def description
+      "#{@target.description}.#{@name}(#{@args.map(&:description).join ", "})"
     end
 
     def target
