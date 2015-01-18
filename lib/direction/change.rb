@@ -1,19 +1,65 @@
 module Direction
   class Change
-    attr_reader :type, :name, :property
+    class << self
+      def current_new
+        self.new_stack.last
+      end
 
-    def initialize(parent, target, property, type, name, *args)
-      @parent = parent.to_timeline_object
+      def current_new?
+        !self.current_new.nil?
+      end
+
+      def push_new(change)
+        self.new_stack.push change
+      end
+
+      def pop_new
+        self.new_stack.pop
+      end
+
+      def new_stack
+        @new_stack ||= []
+      end
+
+      def current
+        self.stack.last
+      end
+
+      def current?
+        !self.current.nil?
+      end
+
+      def push(change)
+        self.stack.push change
+      end
+
+      def pop
+        self.stack.pop
+      end
+
+      def stack
+        @stack ||= []
+      end
+
+      def run(change)
+        self.push change
+        yield if block_given?
+      ensure
+        self.pop
+      end
+    end
+
+    attr_reader :type, :name, :property, :changes
+    attr_accessor :change_set_id
+
+    def initialize(target, property, type, name, *args)
       @target = target.to_timeline_object
       @object = TimelineObject.new :object, self.id
       @type = type
       @name = name
       @property = property
       @args = args.map &:to_timeline_object
-    end
-
-    def parent
-      @parent.value
+      @changes = []
     end
 
     def target
@@ -21,7 +67,12 @@ module Direction
     end
 
     def object
-      @object.value
+      value = @object.value
+      if Snapshot.current?
+        Snapshot.current.add_object self, value
+      end
+      Timeline.current.object_changes[value] = self
+      value
     end
 
     def args

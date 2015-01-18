@@ -1,12 +1,19 @@
 module Direction
   class Snapshot
+    class << self
+      attr_accessor :current
+
+      def current?
+        !self.current.nil?
+      end
+    end
+
     def initialize
       @objects = {}
     end
 
     def add_object(change, object)
       @objects[change.id] = object
-      self
     end
 
     def find_object(change_id)

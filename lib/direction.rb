@@ -11,6 +11,7 @@ require "direction/delta"
 require "direction/delta_set"
 require "direction/timeline_error"
 require "direction/change"
+require "direction/change_set"
 require "direction/timeline_object"
 require "direction/snapshot"
 

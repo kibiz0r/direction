@@ -3,7 +3,7 @@ module Direction
     attr_reader :type, :id
 
     def initialize(type, id = nil)
-      @type = type # :nil, :constant, :change, :object (return value of change)
+      @type = type # :nil, :constant, :change, :change_set, :object (return value of change)
       @id = id
     end
 
@@ -15,6 +15,8 @@ module Direction
         self.id.constantize
       when :change
         Timeline.find_change self.id
+      when :change_set
+        Timeline.find_change_set self.id
       when :object
         Timeline.find_object self.id
       else

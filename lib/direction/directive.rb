@@ -7,7 +7,10 @@ module Direction
     end
 
     def value
-      @change.object
+      obj = @change.object
+      puts "Directive#value: #{@change.target} #{@change.name} #{@change.id}"
+      p obj
+      obj
     end
 
     def dup
@@ -31,6 +34,7 @@ module Direction
     end
 
     def apply
+      puts "Directive#apply"
       subject.send name, *args
     end
 

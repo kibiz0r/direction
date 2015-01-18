@@ -24,8 +24,9 @@ class Object
   end
 
   def delta_push(property, name, *args)
-    change = Change.new Timeline.head,
-      self,
+    puts "delta_push"
+
+    change = Change.new self,
       property,
       :delta,
       name,
@@ -101,8 +102,7 @@ class Object
       name = "directionful_new"
     end
 
-    change = Change.new Timeline.head,
-      self,
+    change = Change.new self,
       nil,
       :directive,
       name,
@@ -188,6 +188,17 @@ class Object
     # property = instance_variable_get :"@#{name}"
     # property.value = delta.value
     delta
+  end
+
+  def to_timeline_object
+    puts "to_timeline_object: #{self}"
+    p Timeline.current.object_graph
+    change = Timeline.current.object_changes[self]
+    if change.nil? && Change.current_new?
+      change = Change.current_new
+      Timeline.current.object_graph[change.id] = self
+    end
+    TimelineObject.new :object, change.id
   end
 
   # def property_get(name)

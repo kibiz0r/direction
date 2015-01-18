@@ -5,6 +5,10 @@ describe "Calculator Example" do
   class Calculator
     prop_accessor :display
 
+    def initialize
+      puts "Calculator.new"
+    end
+
     def press_5
     end
 
@@ -40,7 +44,10 @@ describe "Calculator Example" do
       # FIXME
       # This will cause infinite recursion, because this enact! happens
       # within the enact!.new of this class
-      self.calculator = enact!(Calculator).new
+      c = enact!(Calculator).new
+      puts "c:"
+      p c
+      self.calculator = c
       # @calculator = Property(Calculator).new
     end
 
@@ -69,6 +76,8 @@ describe "Calculator Example" do
 
     describe "#do_press_5" do
       it "presses 5 within this timeline" do
+        expect(subject).to be_a(CalculatorPropertyController)
+
         subject.do_press_5
 
         change = calculator.object_history.changes[0]
