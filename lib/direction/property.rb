@@ -3,14 +3,16 @@ module Direction
     attr_reader :subject, :name
 
     def initialize(subject, name)
-      @subject = subject
+      @subject = subject.to_timeline_object
       @name = name
     end
 
     def value
-      changes = Timeline.changes.select do |change|
+      snapshot = Snapshot.current || Timeline.current_snapshot
+      p snapshot
+      changes = snapshot.changes.select do |change_id, change|
         change.is_a? Delta and
-          change.property == @name
+          change.property == self.name
       end
       changes.last.value
     end

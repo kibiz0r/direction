@@ -21,12 +21,10 @@ module Direction
         @stack ||= []
       end
 
-      def run(snapshot, change_set)
-        Snapshot.current = snapshot
+      def run(change_set)
         self.push change_set
         yield if block_given?
       ensure
-        Snapshot.current = nil
         self.pop
       end
     end

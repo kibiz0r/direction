@@ -71,7 +71,6 @@ module Direction
       if Snapshot.current?
         Snapshot.current.add_object self, value
       end
-      Timeline.current.object_changes[value] = self
       value
     end
 

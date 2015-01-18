@@ -102,8 +102,16 @@ class Object
       name = "directionful_new"
     end
 
-    change = Change.new self,
-      nil,
+    target, property = if self.is_a? Property
+                         [self.value, self.name]
+                       else
+                         [self, nil]
+                       end
+
+    puts "Change.new #{target}:#{property}, #{name}"
+
+    change = Change.new target,
+      property,
       :directive,
       name,
       *args
@@ -192,11 +200,12 @@ class Object
 
   def to_timeline_object
     puts "to_timeline_object: #{self}"
-    p Timeline.current.object_graph
-    change = Timeline.current.object_changes[self]
+    snapshot = Snapshot.current || Timeline.current_snapshot
+    change = snapshot.object_changes[self]
+    # change = Snapshot.current.object_changes[self]
     if change.nil? && Change.current_new?
       change = Change.current_new
-      Timeline.current.object_graph[change.id] = self
+      Snapshot.current.object_changes[self] = change
     end
     TimelineObject.new :object, change.id
   end
