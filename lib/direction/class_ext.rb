@@ -3,26 +3,6 @@ class Class
     Direction::TimelineObject.new :constant, self.name
   end
 
-  def prop_accessor(*names)
-    names.each do |name|
-      name = name.to_sym
-      ivar = :"@#{name}"
-      getter = name
-      setter = :"#{name}="
-
-      instance_properties << name
-
-      define_method getter do
-        property_get name
-      end
-
-      define_method setter do |value|
-        instance_variable_set ivar, Property.new(self, name)
-        property_set name, value
-      end
-    end
-  end
-
   def directive(prototype, &body)
     if prototype.is_a? Hash
       name, delta_name = prototype.first
@@ -47,10 +27,6 @@ class Class
 
   def instance_directives
     @instance_directives ||= {}
-  end
-
-  def instance_properties
-    @instance_properties || []
   end
 
   # #delta means that you intend to return a new value as the result of the delta.

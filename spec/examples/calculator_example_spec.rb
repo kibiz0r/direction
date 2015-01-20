@@ -54,7 +54,7 @@ describe "Calculator Example" do
     def do_press_5
       # will be tracked by property name,
       # not as the return value of the enact!(Calculator).new directive
-      enact!(@calculator).press_5
+      enact!.calculator.press_5
     end
 
     def enact_do_press_5
@@ -305,12 +305,12 @@ describe "Calculator Example" do
     it "combines changes" do
       alter(subject).display = ""
       alter(subject).display + "1"
-      to_merge = Timeline.branch do
+      to_merge = Direction::Timeline.branch do
         alter(subject).display + "3"
       end
       alter(subject).display + "2"
 
-      Timeline.merge to_merge
+      Direction::Timeline.merge to_merge
 
       expect(subject.display).to eq("123")
     end
