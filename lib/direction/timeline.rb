@@ -54,6 +54,21 @@ module Direction
       def root_snapshot
         self.current.root_snapshot
       end
+
+      def to_timeline_object(object)
+        case object
+        when Class
+          TimelineConstant.new object.name
+        when nil
+          TimelineNil.new
+        when Object
+          puts "to_timeframe_object: #{object}"
+          timeframe_object = Timeframe.to_timeframe_object object
+          TimelineObject.new timeframe_object.id
+        else
+          raise "Can't convert to timeline object: #{object}"
+        end
+      end
     end
 
     attr_reader :root_snapshot

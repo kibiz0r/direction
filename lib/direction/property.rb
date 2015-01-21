@@ -3,7 +3,7 @@ module Direction
     attr_reader :subject, :name
 
     def initialize(subject, name)
-      @subject = subject.to_timeline_object
+      @subject = subject
       @name = name
     end
 

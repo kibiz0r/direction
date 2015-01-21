@@ -32,32 +32,6 @@ module Direction
         self.current.enact subject, property_name, method, *args
       end
 
-      def get_property(subject, property_name)
-        self.current.get_property subject, property_name
-      end
-
-      def set_property(subject, property_name, value)
-        self.current.set_property subject, property_name, value
-      end
-
-      def alter_property(subject, property_name, delta_name, *args)
-        self.current.alter_property subject, property_name, delta_name, *args
-      end
-
-      def has_property?(subject, property_name)
-        subject.class.instance_properties.include? property_name.to_sym
-      end
-
-      def has_delta?(subject, prototype)
-        if prototype.is_a? Array
-          method = prototype[0]
-          subject.respond_to? method
-        else
-          name = prototype
-          subject.class.delta_defined? name
-        end
-      end
-
       def find_change_value(snapshot_change)
         self.current.find_change_value snapshot_change
       end
@@ -136,26 +110,6 @@ module Direction
       alter_property subject, property_name, :set, value
     end
 
-    def alter_property(subject, property_name, delta_name, *args)
-      puts "alter_property #{subject}, #{property_name}, #{delta_name}, #{args}"
-      change = SnapshotChange.new subject,
-        property_name,
-        :delta,
-        delta_name,
-        *args
 
-      properties_of(subject)[property_name] = change
-      # change.value = value
-      change.value
-
-      Delta.new change
-    end
-
-    def delta_invoke(subject, delta_name, *args)
-      unless definition = subject.class.instance_delta(delta_name)
-        raise "#{subject.class} has no delta definition for #{delta_name}"
-      end
-      subject.instance_exec *args, &definition
-    end
   end
 end

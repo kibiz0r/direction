@@ -14,11 +14,11 @@ module Direction
         instance_properties << name
 
         define_method getter do
-          Snapshot.get_property self, name
+          Timeframe.get_property self, name
         end
 
         define_method setter do |value|
-          Snapshot.set_property self, name, value
+          Timeframe.set_property self, name, value
         end
       end
     end

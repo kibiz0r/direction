@@ -19,7 +19,7 @@ module Direction
     end
 
     def value
-      Timeline.delta_value self.id
+      # Timeline.delta_value self.id
     end
 
     def dup

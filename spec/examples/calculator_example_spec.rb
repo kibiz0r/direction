@@ -299,10 +299,14 @@ describe "Calculator Example" do
 
   describe "timeline merging" do
     subject do
-      Calculator.new
+      enact!(Calculator).new
     end
 
     it "combines changes" do
+      puts "get subject"
+      s = subject
+      puts "subject:"
+      p s
       alter(subject).display = ""
       alter(subject).display + "1"
       to_merge = Direction::Timeline.branch do
