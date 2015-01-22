@@ -1,7 +1,7 @@
 module Direction
   module PropAccessor
     def instance_properties
-      @instance_properties || []
+      @instance_properties ||= []
     end
 
     def prop_accessor(*names)

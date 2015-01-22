@@ -6,25 +6,21 @@ module Direction
       end
 
       def method_missing(method, *args)
+        ::Kernel.puts method
         method = method.to_s
 
         if method.end_with? "="
           property_name = method.chomp "="
-          prototype = [property_name, :set]
-        else
-          prototype = method
-        end
-
-        if Timeframe.has_delta? @subject, prototype
-          Timeframe.alter_object @subject, :set, *args
-        elsif @subject.respond_to? method
-          if method.end_with? "="
-            ::Kernel.raise "No delta #{prototype} on #@subject"
+          property = Timeframe.property_of @subject, property_name
+          if Timeframe.has_delta? property, :set
+            Timeframe.alter_object property, :set, *args
           else
-            AlterProperty.new @subject, method
+            ::Kernel.raise "No property #{property_name} on #{@subject}"
           end
+        elsif Timeframe.has_property? @subject, method
+          AlterProperty.new @subject, method
         else
-          ::Kernel.raise "No delta #{prototype} or method #{method} on #@subject"
+          ::Kernel.raise "No property or method #{method} on #@subject"
         end
       end
     end
@@ -37,12 +33,13 @@ module Direction
 
       def method_missing(method, *args)
         ::Kernel.puts "method_missing #{method}"
-        prototype = [@property_name, method]
 
-        if Timeframe.has_delta? @subject, prototype
-          Timeframe.alter_object @subject, :set, *args
+        property = Timeframe.property_of(@subject, @property_name)
+
+        if Timeframe.has_delta? property, method
+          Timeframe.alter_object property, method, *args
         else
-          ::Kernel.raise "No delta #{prototype} on #@subject"
+          ::Kernel.raise "No delta #{method} on #{property}"
         end
       end
     end

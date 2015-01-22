@@ -9,7 +9,7 @@ module Direction
         if Timeframe.has_property? @subject, method and args.empty?
           EnactProperty.new @subject, method
         else
-          Timeframe.enact_directive @subject, nil, method, *args
+          Timeframe.enact_directive @subject, method, *args
         end
       end
     end
@@ -21,7 +21,7 @@ module Direction
       end
 
       def method_missing(method, *args)
-        Timeframe.enact_directive @subject, @property_name, method, *args
+        Timeframe.enact_directive @subject, method, *args
       end
     end
 
@@ -34,7 +34,7 @@ module Direction
         if Timeframe.has_property? @subject, method and args.empty?
           EnactValueProperty.new @subject, method
         else
-          Timeframe.enact_directive(@subject, nil, method, *args).value
+          Timeframe.enact_directive(@subject, method, *args).value
         end
       end
     end
@@ -46,7 +46,7 @@ module Direction
       end
 
       def method_missing(method, *args)
-        Timeframe.enact_directive(@subject, @property_name, method, *args).value
+        Timeframe.enact_directive(@subject, method, *args).value
       end
     end
 

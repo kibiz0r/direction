@@ -7,7 +7,7 @@ module Direction
     end
 
     def value
-      Timeframe.find_results(@change).value
+      Timeframe.find_caused_results(@change).value
     end
   end
 end
