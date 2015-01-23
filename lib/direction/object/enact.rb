@@ -13,7 +13,7 @@ module Direction
       if getter && property = Director.find_property(@subject, name)
         Enact.new property
       else
-        Director.enact_directive @subject, method, *args
+        Director.enact_directive Timeframe.current, @subject, method, *args
       end
     end
   end
@@ -32,7 +32,7 @@ module Direction
       if getter && property = Director.find_property(@subject, name)
         EnactValue.new property
       else
-        Director.enact_directive(@subject, method, *args).value
+        Director.enact_directive(Timeframe.current, @subject, method, *args).value
       end
     end
   end

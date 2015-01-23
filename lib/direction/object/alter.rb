@@ -13,9 +13,9 @@ module Direction
       if getter && property = Director.find_property(@subject, name)
         Alter.new property
       elsif setter && property = Director.find_property(@subject, name)
-        Director.alter_object property, :set, *args
+        Director.alter_object Timeframe.current, property, :set, *args
       else
-        Director.alter_object @subject, name, *args
+        Director.alter_object Timeframe.current, @subject, name, *args
       end
     end
   end
@@ -34,9 +34,9 @@ module Direction
       if getter && property = Director.find_property(@subject, name)
         AlterValue.new property
       elsif setter && property = Director.find_property(@subject, name)
-        Director.alter_object(property, :set, *args).value
+        Director.alter_object(Timeframe.current, property, :set, *args).value
       else
-        Director.alter_object(@subject, name, *args).value
+        Director.alter_object(Timeframe.current, @subject, name, *args).value
       end
     end
   end

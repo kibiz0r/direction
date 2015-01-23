@@ -1,9 +1,8 @@
 module Direction
   class Delta
-    attr_reader :timeframe, :change
+    attr_reader :change
 
-    def initialize(timeframe, change)
-      @timeframe = timeframe
+    def initialize(change)
       @change = change
     end
 

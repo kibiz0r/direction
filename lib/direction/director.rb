@@ -12,15 +12,15 @@ module Direction
       TimelineProperty.new subject, name
     end
 
-    def alter_object(subject, name, *args)
+    def alter_object(timeframe, subject, name, *args)
       puts "alter_object #{subject}, #{name}, #{args}"
 
-      change = Timeframe.change :delta,
+      change = timeframe.change :delta,
         subject,
         name,
         *args
 
-      Delta.new Timeframe.current, change
+      Delta.new change
     end
 
     def get_property(timeframe, subject, name)
@@ -29,8 +29,13 @@ module Direction
       timeframe.properties[key]
     end
 
-    def enact_directive(subject, name, *args)
-      change = Timeframe.change :directive,
+    def set_property(timeframe, subject, name, value)
+      property = find_property subject, name
+      alter_object timeframe, property, :set, value
+    end
+
+    def enact_directive(timeframe, subject, name, *args)
+      change = timeframe.change :directive,
         subject,
         name,
         *args
@@ -40,7 +45,7 @@ module Direction
       # - and doing so causes:
       # runs the change's code in a new timeframe
       # but doesn't collapse it to a result for the timeline yet
-      Directive.new Timeframe.current, change
+      Directive.new change
       # accessing the directive value is fine, and only requires having the
       # timeframe result
       #
@@ -108,6 +113,8 @@ module Direction
     end
 
     def to_timeline_object(object)
+      puts "to_timeline_object #{object}"
+      # binding.pry
       case object
       when Class
         TimelineConstant.new object.name
@@ -116,6 +123,8 @@ module Direction
       when String
         TimelineString.new object
       when Object
+        puts "looking for introducing change for #{object}"
+        p Timeframe.current.changes
         introducing_change = Timeframe.current.changes.to_a.find do |key, change|
           change.return_value == object
         end[1].change
@@ -152,12 +161,16 @@ module Direction
         current.get_property timeframe, subject, name
       end
 
-      def alter_object(subject, name, *args)
-        current.alter_object subject, name, *args
+      def set_property(timeframe, subject, name, value)
+        current.set_property timeframe, subject, name, value
       end
 
-      def enact_directive(subject, name, *args)
-        current.enact_directive subject, name, *args
+      def alter_object(timeframe, subject, name, *args)
+        current.alter_object timeframe, subject, name, *args
+      end
+
+      def enact_directive(timeframe, subject, name, *args)
+        current.enact_directive timeframe, subject, name, *args
       end
 
       def timeframe_change(timeframe, change)

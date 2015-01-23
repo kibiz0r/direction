@@ -6,5 +6,9 @@ module Direction
       @subject = subject
       @name = name
     end
+
+    def to_s
+      "Property(#{subject}, #{name})"
+    end
   end
 end

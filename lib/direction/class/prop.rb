@@ -17,7 +17,7 @@ class Class
       end
 
       define_method setter do |value|
-        ::Direction::Director.set_property ::Direction::Timeframe.current, self, name
+        ::Direction::Director.set_property ::Direction::Timeframe.current, self, name, value
       end
     end
   end
