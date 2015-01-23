@@ -1,19 +1,29 @@
 module Direction
   class Timeframe
-    attr_reader :parent, :objects
+    attr_reader :parent, :changes, :properties
     attr_accessor :return_value
 
     def initialize(parent)
       @parent = parent
-      @objects = {}
+      if parent
+        @changes = parent.changes.dup
+        @properties = parent.properties.dup
+      else
+        @changes = {}
+        @properties = {}
+      end
+    end
+
+    def merge!(timeframe)
+      @changes.merge! timeframe.changes
+      @properties.merge! timeframe.properties
     end
 
     def run(&block)
       timeframe = Timeframe.new self
       Timeframe.push timeframe
       begin
-        return_value = yield timeframe
-        timeframe.return_value = return_value
+        timeframe.return_value = yield timeframe
       ensure
         Timeframe.pop
       end
@@ -22,17 +32,26 @@ module Direction
     
     # def realize(change)?
     def commit(change)
-      timeframe_change = Director.timeframe_change self, change
-      @objects[change] = timeframe_change
-      timeframe_change
+      key = change.key
+      if @changes.has_key? key
+        @changes[key]
+      else
+        timeframe_change = Director.timeframe_change self, change
+        @changes[key] = timeframe_change
+        timeframe_change
+      end
+    end
+
+    def change(change_type, subject, name, *args)
+      commit Timeline.change(change_type, subject, name, *args)
     end
 
     def [](timeline_object)
       key = timeline_object.key
-      if @objects.has_key? key
-        @objects[key]
+      if @changes.has_key? key
+        @changes[key]
       else
-        @objects[key] = Director.to_timeframe_object self, timeline_object
+        @changes[key] = Director.to_timeframe_object self, timeline_object
       end
     end
 
@@ -55,6 +74,10 @@ module Direction
 
       def run(&block)
         current.run &block
+      end
+
+      def change(change_type, subject, name, *args)
+        current.change change_type, subject, name, *args
       end
     end
   end

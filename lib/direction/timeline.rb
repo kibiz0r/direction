@@ -1,6 +1,6 @@
 module Direction
   class Timeline
-    attr_reader :head
+    attr_reader :head, :changes
 
     def initialize
       @parents = {}
@@ -10,7 +10,7 @@ module Direction
 
     def change(change_type, subject, name, *args)
       change = Change.new head,
-        :directive,
+        change_type,
         subject,
         name,
         *args

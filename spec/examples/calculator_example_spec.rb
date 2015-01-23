@@ -316,6 +316,8 @@ describe "Calculator Example" do
 
       Direction::Timeline.merge to_merge
 
+      p Direction::Timeline.current.changes
+
       expect(subject.display).to eq("123")
     end
   end

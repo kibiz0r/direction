@@ -15,7 +15,7 @@ module Direction
     def alter_object(subject, name, *args)
       puts "alter_object #{subject}, #{name}, #{args}"
 
-      change = Timeline.change :delta,
+      change = Timeframe.change :delta,
         subject,
         name,
         *args
@@ -25,12 +25,12 @@ module Direction
 
     def get_property(timeframe, subject, name)
       puts "get_property #{timeframe}, #{subject}, #{name}"
-      property = find_timeline_property subject, name
-      timeframe[property]
+      key = [subject, name.to_s]
+      timeframe.properties[key]
     end
 
     def enact_directive(subject, name, *args)
-      change = Timeline.change :directive,
+      change = Timeframe.change :directive,
         subject,
         name,
         *args
@@ -50,6 +50,7 @@ module Direction
     end
 
     def timeframe_change(timeframe, change)
+      puts "timeframe_change #{timeframe}, #{change}"
       # turns a timeline change into a timeframe change
       change_timeframe = timeframe.run do |t|
         subject = to_timeframe_object t, change.subject
@@ -65,10 +66,16 @@ module Direction
           subject.send change.name, *args
         when :delta
           puts "delta #{change}"
-          subject = to_timeframe_object change.subject
-          return_value = run_delta_here
-          if property_delta
-            Timeframe.set_property change.subject, return_value
+          subject = to_timeframe_object t, change.subject
+          puts "on #{subject}"
+          unless definition = subject.class.instance_delta(change.name)
+            raise "#{subject.class} has no delta definition for #{change.name}"
+          end
+          return_value = subject.instance_exec *args, &definition
+          if change.subject.is_a? TimelineProperty
+            owner = to_timeframe_object t, change.subject.subject
+            key = [owner, change.subject.name]
+            t.properties[key] = return_value
           end
           return_value
         else
@@ -76,6 +83,7 @@ module Direction
         end
         # run change
       end
+      timeframe.merge! change_timeframe
       TimeframeChange.new change_timeframe, change
     end
 
@@ -86,11 +94,15 @@ module Direction
       when TimelineConstant
         timeline_object.name.constantize
       when TimelineProperty
-        binding.pry
-        # search up timeframes for property key
-        5
+        subject = to_timeframe_object timeframe, timeline_object.subject
+        key = [subject, timeline_object.name]
+        timeframe.properties[key]
+      when TimelineString
+        timeline_object.value
+      when TimelineObject
+        change = timeline_object.introducing_change
+        timeframe[change].return_value
       else
-        binding.pry
         raise "Unknown timeline object type #{timeline_object.class}"
       end
     end
@@ -104,7 +116,7 @@ module Direction
       when String
         TimelineString.new object
       when Object
-        introducing_change = Timeframe.current.objects.to_a.find do |key, change|
+        introducing_change = Timeframe.current.changes.to_a.find do |key, change|
           change.return_value == object
         end[1].change
         puts "introducing_change"
@@ -116,7 +128,8 @@ module Direction
     end
 
     def directive_value(directive)
-      timeframe_change = directive.timeframe[directive.change]
+      # timeframe_change = directive.timeframe[directive.change]
+      timeframe_change = directive.change
       puts "#{timeframe_change}.return_value: #{timeframe_change.return_value}"
       timeframe_change.return_value
       # get return value of change in this timeframe

@@ -19,7 +19,7 @@ module Direction
     end
 
     def to_s
-      "Change: #{@subject}.#{@name} #{@args}"
+      "Change: (#{type}) #{@subject}.#{@name} #{@args}"
     end
   end
 end
