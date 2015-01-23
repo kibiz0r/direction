@@ -1,7 +1,7 @@
-class Object
-  include Direction::DSL::Enact
-  include Direction::DSL::Alter
+require "direction/object/enact"
+require "direction/object/alter"
 
+class Object
   delta :set do |value|
     value
   end
@@ -15,7 +15,7 @@ class Object
     :<<
   ].each do |operator|
     delta operator do |value|
-      self.send operator, value
+      send operator, value
     end
   end
 end

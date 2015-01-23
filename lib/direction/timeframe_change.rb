@@ -1,5 +1,5 @@
 module Direction
-  class Directive
+  class TimeframeChange
     attr_reader :timeframe, :change
 
     def initialize(timeframe, change)
@@ -7,8 +7,8 @@ module Direction
       @change = change
     end
 
-    def value
-      Director.directive_value self
+    def return_value
+      timeframe.return_value
     end
   end
 end

@@ -1,14 +1,32 @@
 module Direction
   class Timeline
+    attr_reader :head
+
     def initialize
+      @parents = {}
+      @changes = {}
+      @head = nil
     end
 
-    def root_timeframe
-      @root_timeframe ||= Timeframe.new nil
+    def change(change_type, subject, name, *args)
+      change = Change.new head,
+        :directive,
+        subject,
+        name,
+        *args
+
+      commit change
+    end
+
+    def commit(change)
+      id = change.id
+      @parents[id] = @head
+      @changes[id] = change
+      @head = id
+      change
     end
 
     def clear
-      @root_timeframe = nil
     end
 
     def branch
@@ -19,18 +37,19 @@ module Direction
 
     class << self
       def current
-        if self.stack.empty?
-          self.push Timeline.new
+        if stack.empty?
+          Timeframe.push Timeframe.new(nil)
+          push Timeline.new
         end
-        self.stack.last
+        stack.last
       end
 
       def push(timeline)
-        self.stack.push timeline
+        stack.push timeline
       end
 
       def pop
-        self.stack.pop
+        stack.pop
       end
 
       def stack
@@ -38,53 +57,27 @@ module Direction
       end
 
       def branch(&block)
-        self.current.branch &block
+        current.branch &block
       end
 
       def merge(timeline)
-        self.current.merge timeline
+        current.merge timeline
       end
 
       def rebase(timeline)
-        self.current.rebase timeline
+        current.rebase timeline
       end
 
       def commit(change)
-        self.current.commit change
+        current.commit change
       end
 
       def head
-        self.current.head
+        current.head
       end
 
-      def head_snapshot
-        self.current.current_snapshot
-      end
-
-      def enact(subject, method, *args)
-        Timeline.current.enact subject, method, *args
-      end
-
-      def find_snapshot(change_set_id)
-      end
-
-      def root_snapshot
-        self.current.root_snapshot
-      end
-
-      def to_timeline_object(object)
-        case object
-        when Class
-          TimelineConstant.new object.name
-        when nil
-          TimelineNil.new
-        when Object
-          puts "to_timeframe_object: #{object}"
-          timeframe_object = Timeframe.to_timeframe_object object
-          TimelineObject.new timeframe_object.id
-        else
-          raise "Can't convert to timeline object: #{object}"
-        end
+      def change(change_type, subject, name, *args)
+        current.change change_type, subject, name, *args
       end
     end
   end

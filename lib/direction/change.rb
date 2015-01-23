@@ -1,23 +1,25 @@
 module Direction
   class Change
-    attr_reader :timeframe, :previous_change, :subject, :type, :name, :args
+    attr_reader :previous_change, :type, :subject, :name, :args
 
-    def initialize(timeframe, previous_change, subject, type, name, *args)
-      @timeframe = timeframe
+    def initialize(previous_change, type, subject, name, *args)
       @previous_change = previous_change
-      # @subject = subject.to_timeline_object
-      @subject = @timeframe.to_timeframe_object subject
       @type = type
+      @subject = Director.to_timeline_object subject
       @name = name
-      @args = args.map { |a| @timeframe.to_timeframe_object a }
+      @args = args.map { |a| Director.to_timeline_object a }
     end
 
     def id
       object_id
     end
 
-    def description
-      "#{@subject}.#{@name} #{@args}"
+    def key
+      [:change, id]
+    end
+
+    def to_s
+      "Change: #{@subject}.#{@name} #{@args}"
     end
   end
 end

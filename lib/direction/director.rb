@@ -1,6 +1,171 @@
 module Direction
   class Director
-    def command(name, *args)
+    def find_property(subject, name)
+      has = subject.class.instance_properties.include? name.to_sym
+      puts "has property? #{subject}, #{name} : #{has}"
+      if has
+        Property.new subject, name
+      end
+    end
+
+    def find_timeline_property(subject, name)
+      TimelineProperty.new subject, name
+    end
+
+    def alter_object(subject, name, *args)
+      puts "alter_object #{subject}, #{name}, #{args}"
+
+      change = Timeline.change :delta,
+        subject,
+        name,
+        *args
+
+      Delta.new Timeframe.current, change
+    end
+
+    def get_property(timeframe, subject, name)
+      puts "get_property #{timeframe}, #{subject}, #{name}"
+      property = find_timeline_property subject, name
+      timeframe[property]
+    end
+
+    def enact_directive(subject, name, *args)
+      change = Timeline.change :directive,
+        subject,
+        name,
+        *args
+
+      # adds a change to the current timeline
+      # - then turns it into a timeframe change?
+      # - and doing so causes:
+      # runs the change's code in a new timeframe
+      # but doesn't collapse it to a result for the timeline yet
+      Directive.new Timeframe.current, change
+      # accessing the directive value is fine, and only requires having the
+      # timeframe result
+      #
+      # but setting a property to the directive value (or returning it from
+      # this directive, or enacting/altering on it) requires making it (and
+      # the change that created it) available on this timeline
+    end
+
+    def timeframe_change(timeframe, change)
+      # turns a timeline change into a timeframe change
+      change_timeframe = timeframe.run do |t|
+        subject = to_timeframe_object t, change.subject
+        args = change.args.map do |arg|
+          to_timeframe_object t, arg
+        end
+
+        # subject.send change.type, args
+
+        case change.type
+        when :directive
+          puts "directive #{change}"
+          subject.send change.name, *args
+        when :delta
+          puts "delta #{change}"
+          subject = to_timeframe_object change.subject
+          return_value = run_delta_here
+          if property_delta
+            Timeframe.set_property change.subject, return_value
+          end
+          return_value
+        else
+          raise "Unknown change type #{change.type}"
+        end
+        # run change
+      end
+      TimeframeChange.new change_timeframe, change
+    end
+
+    def to_timeframe_object(timeframe, timeline_object)
+      case timeline_object
+      when Change
+        timeframe.commit timeline_object
+      when TimelineConstant
+        timeline_object.name.constantize
+      when TimelineProperty
+        binding.pry
+        # search up timeframes for property key
+        5
+      else
+        binding.pry
+        raise "Unknown timeline object type #{timeline_object.class}"
+      end
+    end
+
+    def to_timeline_object(object)
+      case object
+      when Class
+        TimelineConstant.new object.name
+      when Property
+        TimelineProperty.new object.subject, object.name
+      when String
+        TimelineString.new object
+      when Object
+        introducing_change = Timeframe.current.objects.to_a.find do |key, change|
+          change.return_value == object
+        end[1].change
+        puts "introducing_change"
+        p introducing_change
+        TimelineObject.new introducing_change
+      else
+        raise "Unknown conversion to timeline object for type #{object.class}"
+      end
+    end
+
+    def directive_value(directive)
+      timeframe_change = directive.timeframe[directive.change]
+      puts "#{timeframe_change}.return_value: #{timeframe_change.return_value}"
+      timeframe_change.return_value
+      # get return value of change in this timeframe
+      # does not require return value being known as a timeline object yet
+    end
+
+    def delta_value(delta)
+    end
+
+    class << self
+      def current
+        @current ||= new
+      end
+
+      def find_property(subject, name)
+        current.find_property subject, name
+      end
+
+      def get_property(timeframe, subject, name)
+        current.get_property timeframe, subject, name
+      end
+
+      def alter_object(subject, name, *args)
+        current.alter_object subject, name, *args
+      end
+
+      def enact_directive(subject, name, *args)
+        current.enact_directive subject, name, *args
+      end
+
+      def timeframe_change(timeframe, change)
+        current.timeframe_change timeframe, change
+      end
+
+      def to_timeframe_object(timeframe, timeline_object)
+        current.to_timeframe_object timeframe, timeline_object
+      end
+
+      def to_timeline_object(object)
+        current.to_timeline_object object
+      end
+
+      def directive_value(directive)
+        current.directive_value directive
+      end
+
+      def delta_value(delta)
+        current.delta_value delta
+      end
     end
   end
 end

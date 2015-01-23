@@ -1,5 +1,5 @@
 module Direction
-  class TimeframeString
+  class TimelineString
     attr_reader :value
 
     def initialize(value)
