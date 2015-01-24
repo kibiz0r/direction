@@ -1,6 +1,6 @@
 module Direction
   class Timeframe
-    attr_reader :parent, :changes, :properties
+    attr_reader :parent, :changes, :properties, :timeframe_objects
     attr_accessor :return_value
 
     def initialize(parent)
@@ -18,6 +18,7 @@ module Direction
     def merge!(timeframe)
       @changes.merge! timeframe.changes
       @properties.merge! timeframe.properties
+      @timeframe_objects.merge! timeframe.timeframe_objects
     end
 
     def run(&block)
@@ -56,6 +57,10 @@ module Direction
       else
         raise "Unknown key #{key}"
       end
+    end
+
+    def property_value(property)
+      Director.property_value self, property
     end
 
     def to_timeframe_object(object)
@@ -105,7 +110,8 @@ module Direction
         :change,
         :[],
         :to_timeframe_object,
-        :from_timeframe_object
+        :from_timeframe_object,
+        :property_value
     end
   end
 end

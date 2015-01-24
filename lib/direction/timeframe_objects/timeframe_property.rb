@@ -1,6 +1,6 @@
 module Direction
   class TimeframeProperty
-    attr_reader :timeframe, :property
+    attr_reader :timeframe, :property, :value
 
     def initialize(timeframe, property)
       @timeframe = timeframe
@@ -9,7 +9,8 @@ module Direction
 
     def directive(name, *args)
       puts "#{self} property directive #{name} on #{@value}"
-      @value.send name, *args
+      # @value.send name, *args
+      @value.directive name, *args
     end
 
     def delta(name, *args)

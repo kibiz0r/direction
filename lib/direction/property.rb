@@ -1,26 +1,30 @@
 module Direction
-  class Property < BasicObject
-    attr_reader :subject, :name, :value
+  class Property
+    attr_reader :subject, :name
 
     def initialize(subject, name)
       @subject = subject
       @name = name
-      @value = nil
     end
 
     def to_s
-      "Property##{__id__}(#{subject}, #{name}): #{value}"
+      "Property##{object_id}(#{subject}, #{name})"
     end
 
-    def method_missing(method, *args)
-      value.send method, *args
+    def value
+      puts "Property#value"
+      Timeframe.property_value self
     end
 
-    def send_delta(name, *args)
-      unless definition = value.class.instance_delta(name)
-        raise "#{value.class} has no delta definition for #{name}"
-      end
-      @value = value.instance_exec *args, &definition
+    def set(value)
+      Director.alter_object(Timeframe.current, self, :set, value).value
     end
+
+    # def send_delta(name, *args)
+    #   unless definition = value.class.instance_delta(name)
+    #     raise "#{value.class} has no delta definition for #{name}"
+    #   end
+    #   @value = value.instance_exec *args, &definition
+    # end
   end
 end

@@ -10,6 +10,7 @@ describe "Calculator Example" do
     end
 
     def press_5
+      "pressed 5"
     end
 
     def enact_press_5

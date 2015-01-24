@@ -7,6 +7,10 @@ module Direction
       @object = object
     end
 
+    def directive(name, *args)
+      @object.send name, *args
+    end
+
     def to_s
       "TimeframeObject(#{@object})"
     end

@@ -10,9 +10,9 @@ module Direction
       getter = !setter && args.empty?
       name = method.chomp "="
 
-      if getter && property = Director.find_property(@subject, name)
+      if getter && property = @subject.property_get(name)
         Alter.new property
-      elsif setter && property = Director.find_property(@subject, name)
+      elsif setter && property = @subject.property_get(name)
         Director.alter_object Timeframe.current, property, :set, *args
       else
         Director.alter_object Timeframe.current, @subject, name, *args
@@ -21,7 +21,7 @@ module Direction
   end
 
   class AlterValue < BasicObject
-    def initialize(subject, property_name)
+    def initialize(subject)
       @subject = subject
     end
 
@@ -31,9 +31,9 @@ module Direction
       getter = !setter && args.empty?
       name = method.chomp "="
 
-      if getter && property = Director.find_property(@subject, name)
+      if getter && property = @subject.property_get(name)
         AlterValue.new property
-      elsif setter && property = Director.find_property(@subject, name)
+      elsif setter && property = @subject.property_get(name)
         Director.alter_object(Timeframe.current, property, :set, *args).value
       else
         Director.alter_object(Timeframe.current, @subject, name, *args).value

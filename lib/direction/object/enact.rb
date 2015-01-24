@@ -10,7 +10,7 @@ module Direction
       getter = !setter && args.empty?
       name = method.chomp "="
 
-      if getter && property = Director.find_property(@subject, name)
+      if getter && property = @subject.property_get(name)
         Enact.new property
       else
         Director.enact_directive Timeframe.current, @subject, method, *args
@@ -29,7 +29,7 @@ module Direction
       getter = !setter && args.empty?
       name = method.chomp "="
 
-      if getter && property = Director.find_property(@subject, name)
+      if getter && property = @subject.property_get(name)
         EnactValue.new property
       else
         Director.enact_directive(Timeframe.current, @subject, method, *args).value

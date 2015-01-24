@@ -1,26 +1,5 @@
 module Direction
   class Director
-    def initialize
-      @properties = {}
-    end
-
-    def find_property(subject, name)
-      key = [subject, name.to_sym]
-      if @properties.has_key? key
-        puts "already has property #{subject}, #{name}"
-        return @properties[key]
-      end
-      has = subject.class.instance_properties.include? name.to_sym
-      puts "has property? #{subject}, #{name} : #{has}"
-      if has
-        @properties[key] ||= Property.new subject, name
-      end
-    end
-
-    def find_timeline_property(subject, name)
-      TimelineProperty.new subject, name
-    end
-
     def alter_object(timeframe, subject, name, *args)
       puts "alter_object #{subject}, #{name}, #{args}"
 
@@ -30,6 +9,14 @@ module Direction
         *args
 
       Delta.new change
+    end
+
+    def property_value(timeframe, property)
+      puts "property_value"
+      timeframe_property = timeframe.to_timeframe_object property
+      v = timeframe_property.value.object
+      puts "#{timeframe_property}.value: #{v.inspect}"
+      v
     end
 
     def get_property(timeframe, subject, name)
@@ -95,6 +82,7 @@ module Direction
       when Class
         TimeframeConstant.new timeframe, object.name
       when Property
+        puts "TimeframeProperty.new"
         TimeframeProperty.new timeframe, object
       when Object
         TimeframeObject.new timeframe, object
@@ -118,7 +106,9 @@ module Direction
 
     def directive_value(directive)
       puts "directive_value #{directive}"
-      Timeframe[directive.change].return_value
+      r = Timeframe[directive.change].return_value
+      p r
+      r
     end
 
     def delta_value(delta)
@@ -143,7 +133,8 @@ module Direction
         :from_timeframe_object,
         :to_timeline_object,
         :directive_value,
-        :delta_value
+        :delta_value,
+        :property_value
     end
   end
 end
