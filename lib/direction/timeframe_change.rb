@@ -1,14 +1,17 @@
 module Direction
   class TimeframeChange
-    attr_reader :timeframe, :change
+    attr_reader :timeframe, :type, :subject, :name, :args
 
-    def initialize(timeframe, change)
+    def initialize(timeframe, type, subject, name, *args)
       @timeframe = timeframe
-      @change = change
+      @type = type
+      @subject = timeframe.to_timeframe_object subject
+      @name = name
+      @args = args.map { |a| timeframe.to_timeframe_object a }
     end
 
-    def return_value
-      timeframe.return_value
+    def to_s
+      "TimeframeChange: (#{type}) #{subject}.#{name} #{args}"
     end
   end
 end

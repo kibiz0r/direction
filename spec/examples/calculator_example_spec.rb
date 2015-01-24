@@ -299,7 +299,7 @@ describe "Calculator Example" do
 
   describe "timeline merging" do
     subject do
-      enact!(Calculator).new
+      enact(Calculator).new
     end
 
     it "combines changes" do

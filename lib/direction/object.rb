@@ -1,5 +1,6 @@
 require "direction/object/enact"
 require "direction/object/alter"
+require "direction/object/delta"
 
 class Object
   delta :set do |value|

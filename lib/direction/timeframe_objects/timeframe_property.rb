@@ -1,15 +1,22 @@
 module Direction
   class TimeframeProperty
-    attr_reader :introducing_change, :subject, :property_name
+    attr_reader :timeframe, :property
 
-    def initialize(introducing_change, subject, property_name)
-      @introducing_change = introducing_change
-      @subject = subject
-      @property_name = property_name
+    def initialize(timeframe, property)
+      @timeframe = timeframe
+      @property = property
     end
 
-    def id
-      @introducing_change.id
+    def directive(name, *args)
+      puts "#{self} property directive #{name} on #{@value}"
+      @value.send name, *args
+    end
+
+    def delta(name, *args)
+      puts "#{self} property delta #{name}"
+      @value = property.send_delta name, *args
+      puts "@value = #{@value}"
+      @value
     end
   end
 end
