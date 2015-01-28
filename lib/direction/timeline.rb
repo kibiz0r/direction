@@ -1,47 +1,48 @@
 module Direction
   class Timeline
-    attr_reader :head, :changes
+    attr_reader :changes, :head
 
-    def initialize
-      @parents = {}
-      @changes = {}
-      @head = nil
+    def initialize(changes, head)
+      @changes = changes
+      @head = head
     end
-
-    def change(change_type, subject, name, *args)
-      change = Change.new head,
-        change_type,
-        subject,
-        name,
-        *args
-
-      commit change
-    end
-
-    def commit(change)
-      id = change.id
-      @parents[id] = @head
-      @changes[id] = change
-      @head = id
-      change
-    end
+# 
+#     def change(change_type, subject, name, *args)
+#       change = Change.new head,
+#         change_type,
+#         subject,
+#         name,
+#         *args
+# 
+#       commit change
+#     end
+# 
+#     def commit(change)
+#       id = change.id
+#       @parents[id] = @head
+#       @changes[id] = change
+#       @head = id
+#       change
+#     end
 
     def clear
     end
 
-    def branch
+    def change_set_at(index)
+      change_set_array[index]
     end
 
-    def merge(timeline)
+    def change_set_array
     end
 
     class << self
       def current
-        if stack.empty?
-          Timeframe.push Timeframe.new(nil)
-          push Timeline.new
-        end
-        stack.last
+        Director.timeframe_to_timeline Timeframe.current
+        # if stack.empty?
+        #   Timeframe.push Timeframe.new(nil)
+        #   push Timeline.new
+        # end
+        # stack.last
       end
 
       def push(timeline)
@@ -56,29 +57,16 @@ module Direction
         @stack ||= []
       end
 
-      def branch(&block)
-        current.branch &block
-      end
+      extend Forwardable
 
-      def merge(timeline)
-        current.merge timeline
-      end
-
-      def rebase(timeline)
-        current.rebase timeline
-      end
-
-      def commit(change)
-        current.commit change
-      end
-
-      def head
-        current.head
-      end
-
-      def change(change_type, subject, name, *args)
-        current.change change_type, subject, name, *args
-      end
+      def_delegators :current,
+        :branch,
+        :merge,
+        :rebase,
+        :commit,
+        :head,
+        :change,
+        :change_set_at
     end
   end
 end

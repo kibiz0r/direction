@@ -5,9 +5,9 @@ module Direction
     def initialize(previous_change, type, subject, name, *args)
       @previous_change = previous_change
       @type = type
-      @subject = Director.to_timeline_object subject
+      @subject = subject
       @name = name
-      @args = args.map { |a| Director.to_timeline_object a }
+      @args = args
     end
 
     def id
@@ -21,5 +21,15 @@ module Direction
     def to_s
       "Change: (#{type}) #{subject}.#{name} #{args}"
     end
+
+    def ==(other)
+      other.is_a?(Change) &&
+        self.type == other.type &&
+        self.subject == other.subject &&
+        self.name == other.name &&
+        self.args == other.args
+    end
+
+    alias :eql? :==
   end
 end

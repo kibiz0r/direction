@@ -81,6 +81,25 @@ describe "Calculator Example" do
 
         subject.do_press_5
 
+        change_set_0 = Direction::Timeline.current.change_set_at 0
+        change_0 = change_set_0.change
+        expect(change_0.name).to eq(:new)
+        expect(change_0.subject).to eq(Direction::TimelineConstant.new(:CalculatorPropertyController))
+        expect(change_0.return_value).to be_a(Direction::TimelineObject)
+        expect(change_0.return_value.source).to eq(change_0)
+
+        controller_reference = change_0.return_value
+        controller_calculator_reference = Direction::TimelineProperty.new controller_reference, :calculator
+
+        change_set_1 = Direction::Timeline.current.change_set_at 1
+        change_1 = change_set_1.change
+        expect(change_1.name).to eq(:press_5)
+        expect(change_1.subject).to eq(controller_calculator_reference)
+        expect(change_1.return_value).to be_a(Direction::TimelineObject)
+
+        p Direction::Timeline.current.change_sets
+        p Direction::Timeframe.current.timeframe_objects
+
         change = calculator.object_history.changes[0]
         expect(change.name).to eq(:new)
         expect(change.target).to eq(Calculator)

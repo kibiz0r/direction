@@ -1,62 +1,73 @@
 module Direction
+  # A timeframe is a tool for executing a change,
+  # and turning it into a state.
   class Timeframe
-    attr_reader :parent, :changes, :properties, :timeframe_objects
-    attr_accessor :return_value
+    attr_reader :parent, :state
+    attr_accessor :return_value, :head
 
-    def initialize(parent)
+    extend Forwardable
+
+    def_delegators :state,
+      :[],
+      :[]=
+
+    def initialize(parent = Timeframe.current, state = TimeframeState.new, &block)
       @parent = parent
-      if parent
-        @changes = parent.changes.dup
-        @properties = parent.properties.dup
-      else
-        @changes = {}
-        @properties = {}
+      @state = state
+      @changes = {}
+      @parents = {}
+      @return_values = {}
+      if block_given?
+        Timeframe.push self
+        begin
+          self.return_value = yield self
+        ensure
+          Timeframe.pop
+        end
       end
-      @timeframe_objects = {}
+    end
+
+    def changes(upto = head)
+      puts "changes upto #{head}"
+      changes = []
+      ref = upto
+      while ref
+        changes.unshift ref
+        ref = @parents[ref]
+      end
+      changes
     end
 
     def merge!(timeframe)
-      @changes.merge! timeframe.changes
-      @properties.merge! timeframe.properties
-      @timeframe_objects.merge! timeframe.timeframe_objects
+      # state.merge! timeframe.state
     end
 
     def run(&block)
-      timeframe = Timeframe.new self
-      Timeframe.push timeframe
-      begin
-        timeframe.return_value = yield timeframe
-      ensure
-        Timeframe.pop
-      end
-      timeframe
+      Timeframe.run self, &block
     end
     
     def commit(change)
       key = change
       timeframe = Director.change_timeframe self, change
       @changes[key] = timeframe
+      @parents[key] = head
+      @return_values[timeframe.return_value] = key
+      self.head = key
+      timeframe
     end
 
     def change(change_type, subject, name, *args)
-      change = TimeframeChange.new self,
-        change_type,
+      change = TimeframeChange.new change_type,
         subject,
         name,
         *args
 
-      commit change
-
-      change
+      new_state = commit change
+      new_state.return_value
     end
 
-    def [](key)
-      case key
-      when TimeframeChange
-        @changes[key]
-      else
-        raise "Unknown key #{key}"
-      end
+    def find_introducing_change(object)
+      @return_values[object]
     end
 
     def property_value(property)
@@ -88,6 +99,9 @@ module Direction
 
     class << self
       def current
+        if stack.empty?
+          push Timeframe.new(nil)
+        end
         stack.last
       end
 
@@ -103,10 +117,20 @@ module Direction
         @stack ||= []
       end
 
+      def run(parent, &block)
+        timeframe = new parent
+        push timeframe
+        begin
+          timeframe.return_value = yield timeframe
+        ensure
+          pop
+        end
+        timeframe
+      end
+
       extend Forwardable
 
       def_delegators :current,
-        :run,
         :change,
         :[],
         :to_timeframe_object,

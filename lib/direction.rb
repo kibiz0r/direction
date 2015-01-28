@@ -1,5 +1,6 @@
 require "active_support/core_ext"
 
+require "direction/timeframe_state"
 require "direction/timeframe"
 require "direction/delta"
 require "direction/directive"

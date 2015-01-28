@@ -30,11 +30,33 @@ module Direction
       alter_object timeframe, property, :set, value
     end
 
+    def timeframe_commit(timeframe, change)
+      puts "timeframe_commit #{timeframe}, #{change}"
+      parent_key = [:parent, change]
+      timeframe[parent_key] = timeframe.head
+
+      change_key = [:change, change]
+      timeframe[change_key] = change
+
+      state_key = [:state, change]
+      timeframe[state_key] = timeframe.run do |t|
+        case change.type
+        when :directive
+          change.subject.send change.name, *change.args
+        when :delta
+        end
+      end.state
+
+      timeframe.head = key
+    end
+
     def enact_directive(timeframe, subject, name, *args)
-      change = timeframe.change :directive,
+      change = TimeframeChange.new :directive,
         subject,
         name,
         *args
+
+      timeframe_commit timeframe, change
 
       # adds a change to the current timeline
       # - then turns it into a timeframe change?
@@ -54,21 +76,14 @@ module Direction
       puts "change_timeframe #{timeframe}, #{change}"
 
       change_timeframe = timeframe.run do |t|
-        change.subject.send change.type, change.name, *change.args
-        # subject = change.subject
-        # name = change.name
-        # args = change.args
-
-        # case change.type
-        # when :directive
-        #   puts "directive #{change}"
-        #   subject.send name, *args
-        # when :delta
-        #   puts "delta #{change}"
-        #   subject.send_delta name, *args
-        # else
-        #   raise "Unknown change type #{change.type}"
-        # end
+        case change.type
+        when :directive
+          change.subject.send change.name, *change.args
+        when :delta
+          change.subject.send_delta change.name, *change.args
+        else
+          raise "Unknown change type #{change.type}"
+        end
       end
 
       timeframe.merge! change_timeframe
@@ -104,6 +119,40 @@ module Direction
       end
     end
 
+    def to_timeline_reference(timeframe, object)
+      case object
+      when Class
+        TimelineConstant.new object.name
+      else
+        TimelineObject.new to_timeline_change(timeframe, nil, timeframe.find_introducing_change(object))
+      end
+    end
+
+    def to_timeline_change(timeframe, previous_change, timeframe_change)
+      type = timeframe_change.type
+      subject = to_timeline_reference timeframe, timeframe_change.subject
+      name = timeframe_change.name
+      args = timeframe_change.args.map { |a| to_timeline_reference timeframe, a }
+
+      Change.new previous_change,
+        type,
+        subject,
+        name,
+        *args
+    end
+
+    def timeframe_to_timeline(timeframe)
+      # turn object-based timeframe changes into
+      # id-based timeline changes
+      changes, head = timeframe.changes.inject [[], nil] do |(changes, previous_change), timeframe_change|
+        change = to_timeline_change timeframe, previous_change, timeframe_change
+
+        changes << change
+        [changes, change]
+      end
+      Timeline.new changes, head
+    end
+
     def directive_value(directive)
       puts "directive_value #{directive}"
       r = Timeframe[directive.change].return_value
@@ -134,7 +183,8 @@ module Direction
         :to_timeline_object,
         :directive_value,
         :delta_value,
-        :property_value
+        :property_value,
+        :timeframe_to_timeline
     end
   end
 end
