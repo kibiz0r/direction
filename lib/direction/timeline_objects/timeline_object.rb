@@ -3,11 +3,11 @@ module Direction
     attr_reader :introducing_change
 
     def initialize(introducing_change)
-      @introducing_change = introducing_change
+      @introducing_change = Director.to_timeline_key introducing_change
     end
 
     def key
-      [:object, introducing_change.id]
+      [:object, introducing_change[1]]
     end
 
     def to_s

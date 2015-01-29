@@ -1,61 +1,16 @@
 module Direction
   class ChangeSet
-    class << self
-      def current
-        self.stack.last
-      end
-
-      def current?
-        !self.current.nil?
-      end
-
-      def push(change_set)
-        self.stack.push change_set
-      end
-
-      def pop
-        self.stack.pop
-      end
-
-      def stack
-        @stack ||= []
-      end
-
-      def run(change_set)
-        self.push change_set
-        yield if block_given?
-      ensure
-        self.pop
-      end
+    def initialize(timeline, change)
+      @timeline = timeline
+      @change = change
     end
 
-    attr_reader :changes, :objects
-    attr_accessor :initiating_change
-
-    def initialize(parent)
-      @parent = parent.to_timeline_object
-      @changes = {}
-      @objects = {}
+    def return_value
+      @timeline.value_at @change
     end
 
-    def add_change(change)
-      @changes[change.id] = change
-    end
-
-    def add_object(change, object)
-      @objects[change.id] = object
-    end
-
-    def parent
-      @parent.value
-    end
-
-    def id
-      self.object_id
-    end
-
-    def to_timeline_object
-      TimelineObject.new :change_set, self.id
+    def effects
+      @timeline.effects_at @change
     end
   end
 end

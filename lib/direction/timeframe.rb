@@ -2,7 +2,7 @@ module Direction
   # A timeframe is a tool for executing a change,
   # and turning it into a state.
   class Timeframe
-    attr_reader :parent, :state
+    attr_reader :timeline, :state
     attr_accessor :return_value, :head
 
     extend Forwardable
@@ -11,8 +11,9 @@ module Direction
       :[],
       :[]=
 
-    def initialize(parent = Timeframe.current, state = TimeframeState.new, &block)
-      @parent = parent
+    def initialize(timeline, state = TimeframeState.new, &block)
+      raise "hell" unless timeline.is_a? Timeline
+      @timeline = timeline
       @state = state
       @changes = {}
       @parents = {}
@@ -43,7 +44,25 @@ module Direction
     end
 
     def run(&block)
-      Timeframe.run self, &block
+      Timeframe.run @timeline, &block
+    end
+
+    def run_change(change)
+      Director.timeframe_change self, change
+    end
+
+    def reference_at(key)
+      puts "reference_at #{key}"
+      @timeline.change_at key
+    end
+
+    def resolve(reference)
+      puts "resolve #{reference}"
+      if reference.is_a? Array
+        resolve reference_at(reference)
+      else
+        Director.timeframe_resolve self, reference
+      end
     end
     
     def commit(change)
@@ -99,9 +118,6 @@ module Direction
 
     class << self
       def current
-        if stack.empty?
-          push Timeframe.new(nil)
-        end
         stack.last
       end
 
@@ -117,8 +133,8 @@ module Direction
         @stack ||= []
       end
 
-      def run(parent, &block)
-        timeframe = new parent
+      def run(timeline, &block)
+        timeframe = new timeline
         push timeframe
         begin
           timeframe.return_value = yield timeframe

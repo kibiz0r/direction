@@ -50,6 +50,40 @@ module Direction
       timeframe.head = key
     end
 
+    def timeframe_change(timeframe, change)
+      puts "timeframe_change #{timeframe}, #{change}"
+      timeframe.run do |t|
+        type = change.type
+        subject = t.resolve change.subject
+        name = change.name
+        args = change.args.map do |arg|
+          t.resolve arg
+        end
+
+        case type
+        when :directive
+          subject.send name, *args
+        when :delta
+        end
+      end
+    end
+
+    def timeframe_resolve(timeframe, reference)
+      puts "timeframe_resolve #{timeframe}, #{reference}"
+      case reference
+      when TimelineConstant
+        reference.name.to_s.constantize
+      when TimelineObject
+        change = timeframe.resolve reference.introducing_change
+        puts "value_at #{change.key}"
+        timeframe.timeline.value_at change.key
+        # puts "change.return_value of #{change}"
+        # change.return_value
+      # when Change
+      #   reference
+      end
+    end
+
     def enact_directive(timeframe, subject, name, *args)
       change = TimeframeChange.new :directive,
         subject,
@@ -164,6 +198,30 @@ module Direction
       puts "delta_value #{delta}"
     end
 
+    def to_timeline_key(timeline_reference)
+      case timeline_reference
+      when Array
+        timeline_reference
+      else
+        timeline_reference.key
+      end
+    end
+
+    def timeline_resolve(timeline_reference)
+      case timeline_reference
+      when Change # => TimeframeChange?
+      when TimelineObject # => Object
+        change = timeline_resolve timeline_reference.introducing_change
+        change.return_value
+      end
+    end
+
+    def timeline_timeframe(timeline, key)
+      change = timeline.change_at key
+      previous_timeframe = timeline.timeframe_at change.previous
+      previous_timeframe.run_change change
+    end
+
     class << self
       def current
         @current ||= new
@@ -184,7 +242,13 @@ module Direction
         :directive_value,
         :delta_value,
         :property_value,
-        :timeframe_to_timeline
+        :timeframe_to_timeline,
+        :to_timeline_key,
+        :timeline_resolve,
+        :timeline_value,
+        :timeline_timeframe,
+        :timeframe_change,
+        :timeframe_resolve
     end
   end
 end

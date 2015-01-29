@@ -1,9 +1,9 @@
 module Direction
   class Change
-    attr_reader :previous_change, :type, :subject, :name, :args
+    attr_reader :previous, :type, :subject, :name, :args
 
-    def initialize(previous_change, type, subject, name, *args)
-      @previous_change = previous_change
+    def initialize(previous, type, subject, name, *args)
+      @previous = previous
       @type = type
       @subject = subject
       @name = name
@@ -24,6 +24,7 @@ module Direction
 
     def ==(other)
       other.is_a?(Change) &&
+        self.previous == other.previous &&
         self.type == other.type &&
         self.subject == other.subject &&
         self.name == other.name &&
