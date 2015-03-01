@@ -1,4 +1,4 @@
 module Direction
-  class Timeframe
+  class Effect
   end
 end
