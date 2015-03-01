@@ -1,36 +1,58 @@
+# Eventually, I would like Timeline to allow for tweaking the historical record
+# without re-evaluating anything. But for now, it generates a new history every
+# time you ask for it.
+#
+# I'm trying to stick to a style where Timeline mimicks the interface of
+# ChangeSetHistory, and exposes its raw elements.
+#
+# Since a Timeline maps ids to HistoryChangeSets, and ultimately Timeframes,
+# I'm going with a TimelineChangeSet type for now, meaning that you can
+# directly manipulate its graph by providing a TimelineChangeSet with a
+# Timeframe you have generated separately.
+#
+# I'm still figuring out how to handle the fact that a Timeframe can be
+# modified independently of the HistoryChangeSet, yet the two should remain
+# in sync as much as possible.
 module Direction
   class Timeline
-    attr_reader :head_id
+    attr_accessor :head
 
     def initialize(director)
       @director = director
-      @timeframes = {}
-      @timeframes[nil] = Timeframe.new
       @change_sets = {}
-      @timeline_changes = {}
-      @timeline_change_sets = {}
-    end
-
-    def head
-      find_timeline_change_set head_id
+      @head = nil
     end
 
     def change(subject, name, *args)
-      new_change = Direction::Change.new head_id, subject, name, *args
+      change = HistoryChange.new head, subject, name, *args
 
-      change_timeframe = @director.eval_change new_change, timeframe
+      change_set = extrapolate change
 
-      timeframe_effects = []
-      new_change_set = Direction::ChangeSet.new new_change, timeframe_effects
+      commit change_set
+    end
 
-      change_id = @director.id_change new_change
-      @change_sets[change_id] = new_change_set
-      @timeframes[change_id] = change_timeframe
+    def extrapolate(history_change)
+      change_timeframe = @director.eval_change history_change,
+        timeframe(history_change.parent)
+      TimelineChangeSet.new history_change, change_timeframe
+    end
 
-      @head_id = change_id
+    def replay(history_change_set)
+      change_timeframe = @director.eval_effects history_change_set.effects,
+        timeframe(history_change_set.parent)
+      TimelineChangeSet.new history_change_set, change_timeframe
+    end
 
-      timeline_change = TimelineChange.new self, change_id
-      @timeline_changes[change_id] = timeline_change
+    def write(id, timeline_change_set)
+      @change_sets[id] = timeline_change_set
+    end
+
+    def commit(timeline_change_set)
+      id = @director.id_change_set timeline_change_set
+
+      write id, timeline_change_set
+
+      @head = id
     end
 
     def find_parent_id(change_id)

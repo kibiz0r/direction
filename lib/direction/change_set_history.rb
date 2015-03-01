@@ -30,9 +30,7 @@ module Direction
     # Creates a HistoryChangeSet, parented to head,
     # then writes it to the given id, then sets head to the given id
     def commit(id, basic_change_set)
-      history_change_set = HistoryChangeSet.new head,
-        basic_change_set.cause,
-        basic_change_set.effects
+      history_change_set = head.adopt basic_change_set
 
       write id, history_change_set
 
