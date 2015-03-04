@@ -1,108 +1,82 @@
 require "spec_helper"
 
 describe Direction::Timeframe do
-  subject do
-    described_class.new
-  end
-
-  class Foo
-    prop_accessor :bar
-  end
-
-  describe "#directive" do
-    it "adds a directive and returns it" do
-      foo_directive = subject.directive Foo, :new
-
-      expect(foo_directive).to be_a(Direction::Directive)
-      expect(subject.head).to eq(foo_directive)
+  describe "#change" do
+    it "returns a TimeframeChange" do
+      change = subject.change
+      expect(change).to be_a(Direction::TimeframeChange)
     end
 
-    it "evaluates the directive" do
-      foo = subject.directive(Foo, :new).value
-
-      expect(foo).to be_a(Foo)
-    end
-  end
-
-  describe "#delta" do
-    it "adds a delta and returns it" do
-      foo = Foo.new
-      bar_delta = subject.delta foo.property_get(:bar), :set, 5
-
-      expect(bar_delta).to be_a(Direction::Delta)
-      expect(subject.head).to eq(bar_delta)
-    end
-  end
-
-  # describe ".new" do
-  #   it "makes a new timeframe" do
-  #     timeframe = Timeframe.new(
-  #       [:state, 123] => { foo: 5 }
-  #     )
-  #     timeframe.run do
-  #       # make global changes to Timeframe.current
-  #     end
-  #   end
-  # end
-
-  describe "#branch" do
-    describe "with a block" do
-      it "branches the timeframe and evaluates the block" do
-        branched = subject.branch do
-          Timeframe.current.change # ...
+    context "with a block" do
+      it "passes a ChangeTimeframe" do
+        passed_timeframe = nil
+        subject.change do |timeframe|
+          passed_timeframe = timeframe
         end
-
-        expect(branched).to be_a(Timeframe)
+        expect(passed_timeframe).to be_a(Direction::ChangeTimeframe)
       end
-    end
 
-    describe "without a block" do
-      it "branches the timeframe" do
-        branched = subject.branch
-
-        expect(branched).to be_a(Timeframe)
+      it "sets Timeframe.current to the passed ChangeTimeframe" do
+        current_timeframe = nil
+        passed_timeframe = nil
+        subject.change do |timeframe|
+          passed_timeframe = timeframe
+          current_timeframe = Direction::Timeframe.current
+        end
+        expect(current_timeframe).to eq(passed_timeframe)
       end
-    end
 
-    it "remains unaffected by further changes on the base timeframe" do
-      branched = subject.branch
+      it "lets you set the return value of the TimeframeChange" do
+        change = subject.change do
+          5
+        end
+        expect(change.return_value).to eq(5)
+      end
 
-      branched_change = branched.change # ...
+      it "lets you add effects" do
+        change = subject.change do |timeframe|
+          timeframe.effect
+        end
+        expect(change.effects[0]).to be_a(Direction::TimeframeEffect)
+      end
 
-      subject.change # ...
+      it "lets you set the return value on a nested effect" do
+        change = subject.change do |timeframe|
+          timeframe.effect do
+            5
+          end
+        end
+        expect(change.effects[0].return_value).to eq(5)
+      end
 
-      expect(branched[ref]).to eq(original_value)
-    end
-
-    it "is affected by modifications to changes on the base timeframe" do
-      change = subject.change # ...
-      branched = subject.branch
-
-      # make a change that depends on the first change
-      branched_change = branched.change # ...
-
-      # modify change on base timeframe
-      change.args[0] = 5
-
-      # see that the base modification has affected the branch
-      expect(branched_change.return_value).to eq(something)
+      it "lets you reference a property" do
+        foo = Object.new
+        subject.set_property foo, :bar, 5
+        change = subject.change do |timeframe|
+          timeframe.get_property foo, :bar
+        end
+        expect(change.return_value).to eq(5)
+      end
     end
   end
 
-  describe "#merge" do
-    it "adds the branched changes to the base timeframe" do
-      branched = subject.branch do
-        # ...
-      end
-
-      subject.merge branched
-
-      # timeframe[change] => timeframe_state
-      # timeframe.head => change
-      # timeframe[some_change] =>
-      #   some_change.run timeframe[some_change.parent] => new_state
-      # timeframe[object] => timeframe_object_state
-      expect(subject[ref]).to eq(branched_value)
-    end
-  end
+  # What do I really need out of a timeframe, from the perspective of a timeline?
+  # I need to associate it with a change/effect, so that I can answer questions about:
+  # - the objects involved
+  # - the return value
+  # For a ChangeTimeframe, I need to know its effects.
+  #
+  # Okay, scratch all that. You can do everything you'd want to do to a
+  # Timeline just using TimeframeChanges/Effects. The important thing about
+  # Timeframes is that they know what the value of a property is at this point
+  # in time. The user of a Timeframe can provide whatever snapshot they want,
+  # but if they add it to a Timeline, that snapshot may be invalidated by
+  # modifications to the Timeline, in which case the Timeline will generate a
+  # new snapshot and re-evaluate the TimeframeChange/Effect in a new Timeframe.
+  #
+  # So, Timelines need to be able to generate a snapshot for any point in the
+  # change graph, including effects. But Timeframes also need to be able to
+  # generate snapshots, because each effect you pile on feeds into the next.
+  #
+  # So maybe it's actually Timeframes that generate snapshots? Arrrgh...
 end
