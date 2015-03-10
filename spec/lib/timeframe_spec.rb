@@ -79,4 +79,22 @@ describe Direction::Timeframe do
   # generate snapshots, because each effect you pile on feeds into the next.
   #
   # So maybe it's actually Timeframes that generate snapshots? Arrrgh...
+  #
+  # The thing is, effects need to get ids, too. And they need them immediately,
+  # so you can undo them within the change. Timeframe is going to need to get
+  # a Director, and store Effects in a DAG like Timeline stores ChangeSets...
+  # At which point, Timeframe looks an awful lot like Timeline...
+  #
+  # Maybe there still is a difference that I'm not seeing yet, as I do really
+  # like the idea of separating the id/director part from the object/snapshot
+  # part. Maybe I'll continue down this path until it really becomes apparent
+  # that Timeframes == Timelines.
+  #
+  # It's also entirely possible that Timeline will end up being implemented in
+  # terms of Timeframe features, so that when you query a Timeline, its values
+  # are dependent on the current Timeframe.
+  #
+  # It seems like the best path forward is to follow the example of Git, and
+  # create the basic toolkit of "plumbing" commands (Timeframe) then attach the
+  # "porcelein" interface on top (Timeline).
 end
