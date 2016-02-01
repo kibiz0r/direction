@@ -1,48 +1,64 @@
 module Direction
   class Timeframe
-    attr_reader :focus
+    attr_reader :state
 
-    def initialize(focus = nil, snapshot = {})
-      @focus = focus
-      @snapshot = snapshot
+    def initialize(state = {})
+      @state = state
+    end
+
+    def dup
+      Timeframe.new state.dup
+    end
+
+    def run
+      Timeframe.push self
+      return_value = yield self
+      Timeframe.pop
+      return_value
+    end
+
+    def modify(&block)
+      timeframe = dup
+      return_value = timeframe.run &block
+      merge timeframe
+      return_value
     end
 
     def change(&block)
       change = TimeframeChange.new
-      timeframe = ChangeTimeframe.new change, @snapshot
-      if block_given?
-        timeframe.run &block
+      @state[change][:return_value] = modify do |timeframe|
+        @state[change][:timeframe] = timeframe
+        block.call
       end
       change
     end
 
-    def effect(&block)
-      effect = TimeframeEffect.new
-      timeframe = EffectTimeframe.new effect, @snapshot
-      if block_given?
-        timeframe.run &block
-      end
-      effect
-    end
-
-    def run
-      Timeframe.current = self
-      focus.return_value = yield self
-      Timeframe.current = nil
-    end
-
     def set_property(subject, property, value)
-      properties = @snapshot[subject] ||= {}
+      properties = @state[subject] ||= {}
       properties[property] = value
     end
 
     def get_property(subject, property)
-      properties = @snapshot[subject] ||= {}
+      properties = @state[subject] ||= {}
       properties[property]
     end
 
     class << self
-      attr_accessor :current
+      def current
+        @stack.last
+      end
+
+      def stack
+        @stack ||= []
+      end
+
+      def push(timeframe)
+        stack.push timeframe
+      end
+
+      def pop
+        stack.pop
+      end
     end
   end
 end

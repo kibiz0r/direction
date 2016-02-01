@@ -1,6 +1,17 @@
 require "spec_helper"
 
 describe Direction::Timeframe do
+  # let :director do
+  #   double("director").tap do |d|
+  #     id = 0
+  #     allow(d).to receive(:generate_modification_id) { |m| id += 1 }
+  #   end
+  # end
+
+  subject do
+    Direction::Timeframe.new
+  end
+
   describe "#change" do
     it "returns a TimeframeChange" do
       change = subject.change
@@ -97,4 +108,51 @@ describe Direction::Timeframe do
   # It seems like the best path forward is to follow the example of Git, and
   # create the basic toolkit of "plumbing" commands (Timeframe) then attach the
   # "porcelein" interface on top (Timeline).
+  #
+  # ---
+  #
+  # A Timeframe merges the world of purely object-based TimeframeChanges/Effects
+  # with the world of Timelines, which at least ascribes an id to said changes/effects
+  # and therefore allows it them to be referenced by id or reduced to a history.
+  #
+  # ---
+  #
+  # A Timeline's content is stored in the current Timeframe.
+  #
+  # Modifications get their own Timeframe and Timeline, for use in execution.
+  #
+  # Timeframes feed into the next Modification.
+  #
+  # When a Modification is done evaluating, and the Timeframe is in its set state,
+  # the parent Timeline merges the Timeframe modifications in.
+  #
+  # o Timeframe root
+  # | base: nil
+  # | timeline: master
+  # |
+  # o ChangeSet 1
+  #  \
+  #   o Change 1
+  #    \
+  #     o Timeframe c1
+  #     | base: Timeframe root
+  #     | timeline: c1
+  #     |
+  #     o Effect 1
+  #      \
+  #       o Timeframe e1
+  #       | base: Timeframe c1
+  #       | timeline: e1
+  #      /
+  #     o Set e1.return_value: 5
+  #    /
+  #   o Set c1.return_value: 8
+  #  /
+  # o Set cs1.cause: c1
+  # | cs1.effects: [e1]
+  # |
+  # o Set head: cs1
+  #
+  # Timeframes are the basis for the current state of the app, and have a naive
+  # understanding of the tree of modifications. 
 end
