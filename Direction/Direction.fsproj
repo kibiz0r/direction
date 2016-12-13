@@ -47,6 +47,8 @@
     <Compile Include="History.fs" />
     <Compile Include="Effect.fs" />
     <Compile Include="Directable.fs" />
+    <Compile Include="DirectiveBody.fs" />
+    <Compile Include="DeltaBody.fs" />
     <Compile Include="Directive.fs" />
     <Compile Include="DirectiveDefinition.fs" />
     <Compile Include="Delta.fs" />

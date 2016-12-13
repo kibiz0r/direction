@@ -15,20 +15,44 @@ module TimelineBuilderTest =
         let mutable doorStatus = CarDoorClosed
         let mutable currentGear = 1
 
-        member this.DoorOpened () : Delta =
+        member this.DoorOpened () : DeltaBody =
             delta {
-                alter (doorStatus <- CarDoorOpened)
+                doorStatus <- CarDoorOpened
             }
 
-        member this.OpenDoor () : Directive<CarDoorStatus> =
+        member this.DoorOpenedD () : Delta =
+            Delta ()
+
+        member this.OpenDoor () : DirectiveBody<CarDoorStatus> =
             directive {
-                do! this.DoorOpened ()
+                do! alter this.DoorOpened ()
+                //do! this.DoorOpenedD ()
                 return CarDoorOpened
             }
 
-        member this.ShiftInto (gear : int) : Directive<bool> =
+        member this.LogDoorStatus (status : CarDoorStatus) =
             directive {
-                return true
+                return ()
+            }
+
+        member this.ShiftUp () : DirectiveBody<unit> =
+            directive {
+                return ()
+            }
+
+        member this.ShiftDown () : DirectiveBody<unit> =
+            directive {
+                return ()
+            }
+
+        member this.ShiftInto (gear : int) : DirectiveBody<unit> =
+            directive {
+                if currentGear > gear then
+                    while currentGear > gear do
+                        do! enact this.ShiftDown ()
+                elif currentGear < gear then
+                    while currentGear < gear do
+                        do! enact this.ShiftUp ()
             }
 
     [<Test>]
@@ -36,8 +60,10 @@ module TimelineBuilderTest =
         let myTimeline =
             timeline {
                 let car = Car ()
-                let! opened = car.OpenDoor ()
-                return opened
+                let! openDoor = enact car.OpenDoor ()
+                //let logDoorStatus = enact car.LogDoorStatus
+                //do! openDoor >=> logDoorStatus
+                do! enact car.ShiftInto 3
             }
         true |> should be True
 

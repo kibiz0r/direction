@@ -3,6 +3,10 @@
 open System
 
 type Directive<'T> () =
-    class
     inherit Directable<'T> ()
-    end
+
+    static member Enact (source : 'T -> DirectiveBody<'U>, argument : 'T) =
+        Directive<'U> ()
+
+    static member EnactValue (source : 'T -> DirectiveBody<'U>, argument : 'T) =
+        Unchecked.defaultof<'U>
