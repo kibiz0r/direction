@@ -49,11 +49,12 @@
     <Compile Include="Directable.fs" />
     <Compile Include="DirectiveBody.fs" />
     <Compile Include="DeltaBody.fs" />
-    <Compile Include="Directive.fs" />
     <Compile Include="DirectiveDefinition.fs" />
-    <Compile Include="Delta.fs" />
+    <Compile Include="Directive.fs" />
     <Compile Include="DeltaDefinition.fs" />
+    <Compile Include="Delta.fs" />
     <Compile Include="Timeline.fs" />
+    <Compile Include="Directed.fs" />
     <Compile Include="TimelineBuilder.fs" />
     <Compile Include="DirectiveBuilder.fs" />
     <Compile Include="DeltaBuilder.fs" />

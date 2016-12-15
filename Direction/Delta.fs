@@ -3,7 +3,5 @@
 open System
 
 type Delta () =
-    inherit Directable<unit> ()
-
-    static member Alter (source : 'T -> DeltaBody, argument : 'T) =
+    static member Alter (definition : DeltaDefinition<'T>, argument : 'T) =
         Delta ()

@@ -4,17 +4,17 @@ open System
 open FSharp.Quotations
 
 type TimelineBuilder () =
-    member this.Bind (a : Directive<'T>, b : 'V -> 'W) : Timeline =
-        Timeline ()
+    member this.Bind (directive : Directive<'T>, f : 'T -> Directive<'U>) : Directive<'U> =
+        Directive<'U> ()
 
-    member this.Return (f : 'T) : Timeline =
-        Timeline ()
+    member this.Return (f : 'T) : Directive<'T> =
+        Directive<'T> ()
 
-    member this.Zero () =
-        Timeline ()
+    member this.Zero<'T> () =
+        Directive<'T> ()
 
-    member this.Yield (_ : 'T) : Timeline =
-        Timeline ()
+    member this.Yield (_ : 'T) : int =
+        5
 
     member this.Quote (expr : Expr) =
         expr

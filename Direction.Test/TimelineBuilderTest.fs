@@ -4,6 +4,7 @@ open System
 open Direction
 open NUnit.Framework
 open FsUnit
+open System.Reflection
 
 [<TestFixture>]
 module TimelineBuilderTest =
@@ -14,6 +15,8 @@ module TimelineBuilderTest =
     type Car () =
         let mutable doorStatus = CarDoorClosed
         let mutable currentGear = 1
+
+        member this.DoorStatus = doorStatus
 
         member this.DoorOpened () : DeltaBody =
             delta {
@@ -59,11 +62,16 @@ module TimelineBuilderTest =
     let ``Playground`` () =
         let myTimeline =
             timeline {
-                let car = Car ()
+                let! car = create Car ()
                 let! openDoor = enact car.OpenDoor ()
                 //let logDoorStatus = enact car.LogDoorStatus
                 //do! openDoor >=> logDoorStatus
-                do! enact car.ShiftInto 3
+                let e = enact car.ShiftInto 3
+                do! e
             }
-        true |> should be True
+        let car = myTimeline.GetDirected<Car> "car"
+        car.Value.DoorStatus |> should equal CarDoorOpened
 
+    // Prototype should be same as data in DirectiveDefinition, I think... just the return type that's new here.
+    let directiveInvocationSignature (this : Directed<obj option>, methodInfo : Directed<MethodInfo>, arguments : Directed<obj list>) : Directed<Directive<obj>> =
+        Directed<Directive<obj>> (Timeline (), "")

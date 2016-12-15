@@ -1,7 +1,7 @@
 ﻿namespace Direction
 
 open System
+open FSharp.Quotations
 
-type DeltaBody () =
-    class
-    end
+type DeltaBody (expr : Expr) =
+    member this.Expr = expr
