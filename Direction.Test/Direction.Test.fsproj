@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="TimelineBuilderTest.fs" />
+    <Compile Include="DirectiveTest.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Direction\Direction.fsproj">

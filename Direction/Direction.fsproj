@@ -49,6 +49,7 @@
     <Compile Include="Directable.fs" />
     <Compile Include="DirectiveBody.fs" />
     <Compile Include="DeltaBody.fs" />
+    <Compile Include="IDirectiveDefinition.fs" />
     <Compile Include="DirectiveDefinition.fs" />
     <Compile Include="Directive.fs" />
     <Compile Include="DeltaDefinition.fs" />
@@ -59,6 +60,10 @@
     <Compile Include="DirectiveBuilder.fs" />
     <Compile Include="DeltaBuilder.fs" />
     <Compile Include="TopLevelOperations.fs" />
+    <Compile Include="Timeframe.fs" />
+    <Compile Include="ITimeframeDiviningContext.fs" />
+    <Compile Include="TimeframeDiviningContext.fs" />
+    <Compile Include="TimeframeDiviner.fs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
