@@ -2,42 +2,36 @@
 
 open System
 open FSharp.Quotations
+open FSharp.Quotations.Evaluator
+open FSharp.Quotations.Patterns
+open Divination
 
 type DirectiveBuilder () =
-    member this.Bind (directive : Directive<'T>, func : 'T -> DirectiveBody<'U>) : DirectiveBody<'U> =
-        DirectiveBody<'U> (Expr.Value (obj ()) |> Expr.Cast)
+    member this.Bind ([<ReflectedDefinition>] directiveExpr : Expr<Directive<'T>>, body : 'T -> Directive<'U>) : Directive<'U> =
+        printfn "%A" directiveExpr
+        Directive<'U> <| fun () ->
+            let directive = directiveExpr |> QuotationEvaluator.Evaluate
+            (body directive.Value).Value
 
-    member this.Bind (delta : Delta, func : 'T -> DirectiveBody<'U>) : DirectiveBody<'U> =
-        DirectiveBody<'U> (Expr.Value (obj ()) |> Expr.Cast)
+    member this.Return ([<ReflectedDefinition>] valueExpr : Expr<'T>) : Directive<'T> =
+        Directive<'T> <| fun () ->
+            valueExpr |> QuotationEvaluator.Evaluate
 
-    member this.Zero () : DirectiveBody<'T> =
-        DirectiveBody<'T> (Expr.Value (obj ()) |> Expr.Cast)
+    member this.For (source : Directive<'T>, body : 'T -> Directive<'U>) : Directive<'U> =
+        Directive<'U> <| fun () ->
+            (body source.Value).Value
 
-    member this.Delay (f : unit -> DirectiveBody<'T>) : DirectiveBody<'T> =
-        DirectiveBody<'T> (Expr.Value (obj ()) |> Expr.Cast)
+    member this.Yield (expr : 'T) =
+        Directive<'T> <| fun () -> expr
 
-    member this.Combine (body1 : DirectiveBody<'T>, body2 : DirectiveBody<'T>) : DirectiveBody<'T> =
-        DirectiveBody<'T> (Expr.Value (obj ()) |> Expr.Cast)
+    [<CustomOperation ("alter", MaintainsVariableSpace = true)>]
+    member this.Alter (source : Directive<'T>, [<ProjectionParameter; ReflectedDefinition (true)>] alterationExprWithValue : Expr<'T -> unit>) : Directive<'T> =
+        match alterationExprWithValue with
+        | WithValue (_, _, (:? Expr<'T -> unit> as alterationExpr)) ->
+            let alteration = alterationExpr |> QuotationEvaluator.Evaluate
+            alteration source.Value
+            source
+        | _ -> invalidOp ""
 
-    member this.While (guard : unit -> bool, source : DirectiveBody<'T>) : DirectiveBody<'T> =
-        DirectiveBody<'T> (Expr.Value (obj ()) |> Expr.Cast)
-
-    member this.Yield (v : 'T) : DirectiveBody<'T> =
-        DirectiveBody<'T> (Expr.Value (obj ()) |> Expr.Cast)
-
-    member this.Return (v : 'T) : DirectiveBody<'T> =
-        DirectiveBody<'T> (Expr.Value (obj ()) |> Expr.Cast)
-
-    member this.Quote (expr : Expr) =
-        expr
-
-    member this.Run (expr : Expr<DirectiveBody<'T>>) : DirectiveBody<'T> =
-        DirectiveBody<'T> (Expr.Value (obj ()) |> Expr.Cast)
-
-    //[<CustomOperation("enact")>]
-    //member this.Enact (source : DirectiveDefinition<'T, 'U>, directive : DirectiveDefinition<'V, 'W>) : Directive<'W> =
-    //    Directive<'U> ()
-
-    //[<CustomOperation("alter")>]
-    //member this.Alter (source : DirectiveDefinition<'T, 'U>, delta : DeltaDefinition<'V>, argument : 'V) : Delta =
-    //    Delta ()
+    //member this.Run (expr : 'T) : Directive<'T> =
+    //    Directive<'T> <| fun () -> expr

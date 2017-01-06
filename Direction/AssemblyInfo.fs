@@ -1,4 +1,4 @@
-﻿namespace Direction
+namespace Direction.Old
 open System.Reflection
 open System.Runtime.CompilerServices
 

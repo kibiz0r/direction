@@ -1,15 +1,13 @@
 ﻿namespace Direction
 
 open System
-open Divination
 
-type Directive<'ReturnType> (definition : IDirectiveDefinition<'ReturnType>, argument : IDivinable) =
-    interface IDivinable with
-        member this.DivineExpr diviner =
-            DivinedExpr.DivinedValue { DivinedValueExpr.Value = 5; TypeName = typeof<int>.AssemblyQualifiedName }
+type Directive<'T> (value : unit -> 'T) =
+    let mutable _value : 'T option = None
 
-    interface IDivinable<'ReturnType> with
-        member this.Raw = this :> IDivinable
-
-    static member Enact<'ArgumentType> (definition : DirectiveDefinition<'ArgumentType, 'ReturnType>, argument : IDivinable<'ArgumentType>) =
-        Directive<'ReturnType> (definition, argument)
+    member this.Value =
+        match _value with
+        | Some v -> v
+        | None ->
+            _value <- Some (value ())
+            _value.Value

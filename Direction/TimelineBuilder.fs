@@ -2,35 +2,16 @@
 
 open System
 open FSharp.Quotations
+open FSharp.Quotations.Evaluator
+open Divination
 
 type TimelineBuilder () =
-    let x = 5
-//    member this.Bind (directive : Directive<'T>, f : 'T -> Directive<'U>) : Directive<'U> =
-//        Directive<'U> ()
+    member this.Bind ([<ReflectedDefinition>] directableExpr : Expr<IDirectable<'T>>, body : 'T -> Timeline) : Timeline =
+        printfn "%A" directableExpr
+        Timeline ()
+        //Directable.expr directableExpr
+        //|> Directable.unwrap
+        //|> Directable.bind body
 
-//    member this.Return (f : 'T) : Directive<'T> =
-//        Directive<'T> ()
-
-//    member this.Zero<'T> () =
-//        Directive<'T> ()
-
-//    member this.Yield (_ : 'T) : int =
-//        5
-
-//    member this.Quote (expr : Expr) =
-//        expr
-
-//    member this.Run (expr : Expr) : Timeline =
-//        Timeline ()
-
-    //[<CustomOperation("enact")>]
-    //member this.Enact (source : Timeline, directive : DirectiveDefinition<'T, 'U>, argument : 'T) : Directive<'U> =
-    //    Directive<'U> ()
-
-    //[<CustomOperation("alter")>]
-    //member this.Alter (source : Timeline, delta : DeltaDefinition<'T>, argument : 'T) : Delta =
-    //    Delta ()
-
-    //[<CustomOperation("create")>]
-    //member this.Create (source : Timeline, constructor' : 'T, argument : 'U) =
-    //    obj ()
+    member this.Zero () : Timeline =
+        Timeline ()
