@@ -5,5 +5,5 @@ open Divination
 
 [<AutoOpen>]
 module TopLevelOperations =
-    let timeline = TimelineBuilder ()
+    let timeline (history : History) = TimelineBuilder history
     let directive = DirectiveBuilder ()

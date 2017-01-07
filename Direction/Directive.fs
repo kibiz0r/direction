@@ -1,6 +1,7 @@
 ﻿namespace Direction
 
 open System
+open Divination
 
 type Directive<'T> (value : unit -> 'T) =
     let mutable _value : 'T option = None
@@ -11,3 +12,9 @@ type Directive<'T> (value : unit -> 'T) =
         | None ->
             _value <- Some (value ())
             _value.Value
+
+    interface IDirectable<'T>
+
+    interface IDivinable<'T> with
+        member this.Identify diviner =
+            obj ()

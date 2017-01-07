@@ -1,5 +1,7 @@
 ﻿namespace Direction
 
-type Timeline () =
-    class
-    end
+open System
+
+type Timeline = {
+    History : History
+}
