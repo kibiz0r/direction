@@ -1,7 +1,8 @@
-﻿namespace Direction
+﻿namespace Direction.Dsl
 
 open System
 open Divination
+open Direction.Runtime
 
 [<AutoOpen>]
 module TopLevelOperations =

@@ -43,21 +43,56 @@
     <Reference Include="FSharp.Quotations.Evaluator">
       <HintPath>..\packages\FSharp.Quotations.Evaluator.1.0.7\lib\net40\FSharp.Quotations.Evaluator.dll</HintPath>
     </Reference>
+    <Reference Include="FsPickler">
+      <HintPath>..\packages\FsPickler.3.2.0\lib\net45\FsPickler.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.5\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="FsPickler.Json">
+      <HintPath>..\packages\FsPickler.Json.3.2.0\lib\net45\FsPickler.Json.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="Change.fs" />
-    <Compile Include="History.fs" />
-    <Compile Include="IDirectable.fs" />
-    <Compile Include="Directable.fs" />
-    <Compile Include="Directive.fs" />
-    <Compile Include="Timeline.fs" />
-    <Compile Include="DirectiveBuilder.fs" />
-    <Compile Include="TimelineBuilder.fs" />
-    <Compile Include="TopLevelOperations.fs" />
+    <Compile Include="Data\RevisionId.fs" />
+    <Compile Include="Data\MethodInfoData.fs" />
+    <Compile Include="Data\RevisionExpr.fs" />
+    <Compile Include="Data\ChangeRevisionData.fs" />
+    <Compile Include="Data\EffectRevisionData.fs" />
+    <Compile Include="Data\SnapshotRevisionData.fs" />
+    <Compile Include="Data\RevisionData.fs" />
+    <Compile Include="Data\HistoryData.fs" />
+    <Compile Include="Runtime\IRevision.fs" />
+    <Compile Include="Runtime\ChangeRevision.fs" />
+    <Compile Include="Runtime\EffectRevision.fs" />
+    <Compile Include="Runtime\SnapshotRevision.fs" />
+    <Compile Include="Runtime\Revision.fs" />
+    <Compile Include="Runtime\History.fs" />
+    <Compile Include="Runtime\TimeState.fs" />
+    <Compile Include="Dsl\DirectiveInvocation.fs" />
+    <Compile Include="Dsl\IDirectable.fs" />
+    <Compile Include="Dsl\Directive.fs" />
+    <Compile Include="Dsl\Timeline.fs" />
+    <Compile Include="Dsl\Timeframe.fs" />
+    <Compile Include="Dsl\Directable.fs" />
+    <Compile Include="Dsl\DirectiveBuilder.fs" />
+    <Compile Include="Dsl\TimelineBuilder.fs" />
+    <Compile Include="Dsl\TimeLens.fs" />
+    <Compile Include="Dsl\DirectiveDefinition.fs" />
+    <Compile Include="Dsl\TopLevelOperations.fs" />
+    <Compile Include="Data\HistoryDataJsonSerializer.fs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Data\" />
+    <Folder Include="Runtime\" />
+    <Folder Include="Dsl\" />
+    <Folder Include="Core\" />
   </ItemGroup>
   <Import Project="$(FSharpTargetsPath)" />
 </Project>

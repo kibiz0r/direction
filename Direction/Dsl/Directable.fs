@@ -1,4 +1,4 @@
-﻿namespace Direction
+﻿namespace Direction.Dsl
 
 open System
 

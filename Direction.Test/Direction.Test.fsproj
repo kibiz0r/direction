@@ -51,10 +51,23 @@
     <Reference Include="FSharp.Core">
       <HintPath>..\packages\FSharp.Core.4.0.0.1\lib\net40\FSharp.Core.dll</HintPath>
     </Reference>
+    <Reference Include="FsPickler">
+      <HintPath>..\packages\FsPickler.3.2.0\lib\net45\FsPickler.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.5\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="FsPickler.Json">
+      <HintPath>..\packages\FsPickler.Json.3.2.0\lib\net45\FsPickler.Json.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TimelineBuilderTest.fs" />
-    <Compile Include="DirectiveBuilderTest.fs" />
+    <Compile Include="Dsl\TimelineBuilderTest.fs" />
+    <Compile Include="Dsl\DirectiveBuilderTest.fs" />
+    <Compile Include="Runtime\HistoryTest.fs" />
+    <Compile Include="Data\HistoryDataJsonSerializerTest.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Direction\Direction.fsproj">
@@ -64,6 +77,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Dsl\" />
+    <Folder Include="Runtime\" />
+    <Folder Include="Data\" />
   </ItemGroup>
   <Import Project="$(FSharpTargetsPath)" />
 </Project>
