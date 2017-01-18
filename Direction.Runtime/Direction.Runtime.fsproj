@@ -1,0 +1,68 @@
+﻿<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{4F64D493-4D46-4935-816A-C33F593FB507}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Direction.Runtime</RootNamespace>
+    <AssemblyName>Direction.Runtime</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <PlatformTarget></PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <DefineConstants></DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <GenerateTailCalls>true</GenerateTailCalls>
+    <PlatformTarget></PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup>
+    <FSharpTargetsPath>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets</FSharpTargetsPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(VisualStudioVersion)' == '10.0' OR '$(VisualStudioVersion)' == '11.0'">
+    <FSharpTargetsPath>$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets</FSharpTargetsPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="mscorlib" />
+    <Reference Include="FSharp.Core" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="Divination">
+      <HintPath>..\..\Divination\Divination\bin\Debug\Divination.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="IRevision.fs" />
+    <Compile Include="Directive.fs" />
+    <Compile Include="ChangeRevisionState.fs" />
+    <Compile Include="RevisionState.fs" />
+    <Compile Include="Timeframe.fs" />
+    <Compile Include="TimelineState.fs" />
+    <Compile Include="Timeline.fs" />
+    <Compile Include="IDirectable.fs" />
+    <Compile Include="Directable.fs" />
+    <Compile Include="TimelineDiviner.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Direction.Core\Direction.Core.fsproj">
+      <Project>{C7D1772B-2FA0-456C-9EDF-B66BC349EB61}</Project>
+      <Name>Direction.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Direction.Data\Direction.Data.fsproj">
+      <Project>{B169A48E-1E77-4BAF-9EF1-97A0C4BB35C4}</Project>
+      <Name>Direction.Data</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(FSharpTargetsPath)" />
+</Project>

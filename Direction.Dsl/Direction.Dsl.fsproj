@@ -1,0 +1,70 @@
+﻿<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C9B3FAD5-43B4-4B31-A9E3-CF95A5D82E6B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Direction.Dsl</RootNamespace>
+    <AssemblyName>Direction.Dsl</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <PlatformTarget></PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <DefineConstants></DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <GenerateTailCalls>true</GenerateTailCalls>
+    <PlatformTarget></PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup>
+    <FSharpTargetsPath>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets</FSharpTargetsPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(VisualStudioVersion)' == '10.0' OR '$(VisualStudioVersion)' == '11.0'">
+    <FSharpTargetsPath>$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets</FSharpTargetsPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="mscorlib" />
+    <Reference Include="FSharp.Core" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="FSharp.Quotations.Evaluator">
+      <HintPath>..\packages\FSharp.Quotations.Evaluator.1.0.7\lib\net40\FSharp.Quotations.Evaluator.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="DirectiveDefinition.fs" />
+    <Compile Include="DirectiveInvocation.fs" />
+    <Compile Include="TimelineBuilder.fs" />
+    <Compile Include="DirectiveBuilder.fs" />
+    <Compile Include="TopLevelOperations.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Direction.Core\Direction.Core.fsproj">
+      <Project>{C7D1772B-2FA0-456C-9EDF-B66BC349EB61}</Project>
+      <Name>Direction.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Direction.Data\Direction.Data.fsproj">
+      <Project>{B169A48E-1E77-4BAF-9EF1-97A0C4BB35C4}</Project>
+      <Name>Direction.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Direction.Runtime\Direction.Runtime.fsproj">
+      <Project>{4F64D493-4D46-4935-816A-C33F593FB507}</Project>
+      <Name>Direction.Runtime</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(FSharpTargetsPath)" />
+</Project>
