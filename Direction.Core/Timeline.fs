@@ -1,7 +1,6 @@
-﻿namespace Direction.Runtime
+﻿namespace Direction.Core
 
 open System
-open Direction.Core
 
 type Timeline = {
     Head : ChangeId

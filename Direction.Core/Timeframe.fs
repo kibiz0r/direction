@@ -1,7 +1,6 @@
-﻿namespace Direction.Runtime
+﻿namespace Direction.Core
 
 open System
-open Direction.Core
 
 type Timeframe = {
     ChangeDefinitions : Map<ChangeId, ChangeDefinition>
@@ -26,4 +25,4 @@ module Timeframe =
         timeframe.ChangeResults.[changeId]
 
     let history headId timeframe =
-        { Head = headId; ChangeDefinitions = timeframe.ChangeDefinitions }
+        { HeadId = headId; ChangeDefinitions = timeframe.ChangeDefinitions }

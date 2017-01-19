@@ -10,6 +10,11 @@ type Change<'T> (timeline : Timeline) =
     let definition = Timeframe.definition id timeframe
     let result = Timeframe.result definition timeframe
 
+    let success () =
+        match result with
+        | ChangeSuccess (v, e) -> v, e
+        | ChangeFailure e -> raise e
+
     member this.Timeline = timeline
 
     member this.Id = id
@@ -18,6 +23,7 @@ type Change<'T> (timeline : Timeline) =
     member this.Result = result
 
     member this.Value =
-        match result with
-        | ChangeReturnValue v -> v
-        | ChangeException e -> raise e
+        fst (success ())
+
+    member this.Effects =
+        snd (success ())

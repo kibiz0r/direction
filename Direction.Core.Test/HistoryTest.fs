@@ -29,7 +29,7 @@ module HistoryTest =
                     )
             }
         let changed = History.change changeId change history
-        changed.Head |> should equal changeId
+        changed.HeadId |> should equal changeId
 
 //namespace Direction.Test.Runtime
 
