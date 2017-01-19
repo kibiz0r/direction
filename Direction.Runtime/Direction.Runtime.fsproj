@@ -43,13 +43,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="IRevision.fs" />
-    <Compile Include="Directive.fs" />
     <Compile Include="ChangeRevisionState.fs" />
     <Compile Include="RevisionState.fs" />
     <Compile Include="Timeframe.fs" />
-    <Compile Include="TimelineState.fs" />
+    <Compile Include="ChangeDefinition.fs" />
     <Compile Include="Timeline.fs" />
+    <Compile Include="Change.fs" />
+    <Compile Include="IDirector.fs" />
+    <Compile Include="Directive.fs" />
     <Compile Include="IDirectable.fs" />
     <Compile Include="Directable.fs" />
     <Compile Include="TimelineDiviner.fs" />

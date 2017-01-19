@@ -15,9 +15,9 @@ module HistoryTest =
     [<Test>]
     let ``History does stuff`` () =
         let history = History.empty
-        let changeId = RevisionId.int 1
-        let change =
-            ChangeRevision {
+        let changeId = ChangeId.int 1
+        let change : ChangeDefinition =
+            {
                 Identity =
                     CallIdentity (
                         None,
@@ -28,7 +28,7 @@ module HistoryTest =
                         []
                     )
             }
-        let changed = history |> History.revise changeId change
+        let changed = History.change changeId change history
         changed.Head |> should equal changeId
 
 //namespace Direction.Test.Runtime

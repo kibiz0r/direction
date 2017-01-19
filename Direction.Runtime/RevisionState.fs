@@ -2,5 +2,5 @@
 
 open System
 
-type RevisionState =
+type RevisionResult =
     | ChangeRevisionState of ChangeRevisionState

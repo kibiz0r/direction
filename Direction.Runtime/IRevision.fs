@@ -1,7 +1,7 @@
 ﻿namespace Direction.Runtime
 
 open System
+open Direction.Core
 
 type IRevision =
-    interface
-    end
+    abstract member RevisionId : RevisionId

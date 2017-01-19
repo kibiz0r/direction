@@ -2,7 +2,7 @@
 
 open System
 
-type RevisionGraph = Map<RevisionId, Revision>
+type RevisionGraph = Map<RevisionId, RevisionDefinition>
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module RevisionGraph =

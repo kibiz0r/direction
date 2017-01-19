@@ -54,7 +54,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TimelineStateTest.fs" />
     <Compile Include="TimelineTest.fs" />
   </ItemGroup>
   <ItemGroup>

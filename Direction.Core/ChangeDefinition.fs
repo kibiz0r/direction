@@ -4,6 +4,7 @@ open System
 open Divination
 
 [<StructuralEquality; StructuralComparison>]
-type Change = {
+type ChangeDefinition = {
     Identity : Identity
 }
+

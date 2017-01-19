@@ -2,15 +2,22 @@
 
 open System
 open Direction.Core
-open Divination
 
-type Timeline (history : History, diviner : IDiviner) =
-    let mutable state = TimelineState.fromHistory history
+type Timeline = {
+    Head : ChangeId
+    Timeframe : Timeframe
+}
 
-    member this.Revise (revisionId : RevisionId, revision : Revision) : RevisionState =
-        let value =
-            match revision with
-            | ChangeRevision change ->
-                Diviner.resolve diviner change.Identity
-            | _ -> invalidOp ""
-        RevisionState.ChangeRevisionState (ChangeRevisionValueState value)
+//type Timeline (history : History, processor : ITimelineProcessor) =
+//    let mutable state = TimelineState.fromHistory history
+
+//    member this.Revise (revisionId : RevisionId, revision : Revision) : RevisionState =
+//        let value =
+//            match revision with
+//            | ChangeRevision change ->
+//                Diviner.resolve diviner change.Identity
+//            | _ -> invalidOp ""
+//        RevisionState.ChangeRevisionState (ChangeRevisionValueState value)
+
+//    member this.Change (changeDefinition : ChangeDefinition<'T>) : Change<'T> =
+//        Unchecked.defaultof<Change<'T>>
