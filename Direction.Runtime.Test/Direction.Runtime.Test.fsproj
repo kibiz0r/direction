@@ -54,7 +54,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TimelineTest.fs" />
+    <Compile Include="FSharpDirectorTest.fs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -18,8 +18,13 @@ module Timeframe =
             ChangeResults = Map.add changeDefinition changeResult timeframe.ChangeResults
         }
 
+    let tryDefinition changeId timeframe =
+        Map.tryFind changeId timeframe.ChangeDefinitions
+
     let definition changeId timeframe =
-        timeframe.ChangeDefinitions.[changeId]
+        match tryDefinition changeId timeframe with
+        | Some definition -> definition
+        | None -> raise (MissingChangeDefinitionException ())
 
     let result changeId timeframe =
         timeframe.ChangeResults.[changeId]

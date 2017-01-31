@@ -5,4 +5,6 @@ open FSharp.Quotations
 open Direction.Core
 
 type IDirector =
-    abstract member Change<'T> : Timeframe * Expr<'T> -> Change<'T>
+    abstract member Timeframe : Expr -> Timeframe
+    abstract member ChangeDefinition : Expr -> ChangeId * ChangeDefinition
+    abstract member Change<'T> : Timeframe * ChangeId * ChangeDefinition -> Change<'T>

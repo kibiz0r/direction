@@ -21,10 +21,11 @@ module HistoryTest =
                 Identity =
                     CallIdentity (
                         None,
-                        {
-                            DeclaringType = typeof<Car>.AssemblyQualifiedName
-                            MethodName = "Create"
-                        },
+                        //{
+                        //    DeclaringType = typeof<Car>.AssemblyQualifiedName
+                        //    MethodName = "Create"
+                        //},
+                        obj (),
                         []
                     )
             }

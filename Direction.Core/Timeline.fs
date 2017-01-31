@@ -3,7 +3,7 @@
 open System
 
 type Timeline = {
-    Head : ChangeId
+    HeadId : ChangeId
     Timeframe : Timeframe
 }
 

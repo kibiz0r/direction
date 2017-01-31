@@ -22,9 +22,14 @@ type Directive<'T> (director : IDirector, change : Change<'T>) =
 
     member this.Value = change.Value
 
-    static member EnactExpr (director : IDirector, timeframe : Timeframe, changeExpr : Expr<'T>) : Directive<'T> =
-        let change = director.Change (timeframe, changeExpr)
+    static member EnactDefinition (director : IDirector, timeframe : Timeframe, changeId : ChangeId, changeDefinition : ChangeDefinition) : Directive<'T> =
+        let change = director.Change (timeframe, changeId, changeDefinition)
         Directive<'T> (director, change)
 
-    static member Enact (director : IDirector, timeframe : Timeframe, [<ReflectedDefinition>] changeExpr : Expr<'T>) : Directive<'T> =
-        Directive.EnactExpr (director, timeframe, changeExpr)
+    static member EnactExpr (director : IDirector, changeExpr : Expr<'T>) : Directive<'T> =
+        let timeframe = director.Timeframe (changeExpr)
+        let changeId, changeDefinition = director.ChangeDefinition (changeExpr)
+        Directive.EnactDefinition (director, timeframe, changeId, changeDefinition)
+
+    static member Enact (director : IDirector, [<ReflectedDefinition>] changeExpr : Expr<'T>) : Directive<'T> =
+        Directive.EnactExpr (director, changeExpr)
