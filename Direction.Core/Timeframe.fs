@@ -2,32 +2,21 @@
 
 open System
 
+// A Timeframe is a container for all of the state necessary to evaluate
+// an arbitrary Definition
 type Timeframe = {
-    ChangeDefinitions : Map<ChangeId, ChangeDefinition>
-    ChangeResults : Map<ChangeDefinition, ChangeResult>
+    // Not sure it actually needs a History, and having one may be
+    // problematic, because a Director may dispute how a History's
+    // Definitions would've been Id'd as well as evaluated
+    //History : History
+    ChangeResults : Map<ChangeId, ChangeResult>
+    EffectResults : Map<EffectId, EffectResult>
 }
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Timeframe =
     let empty =
-        { ChangeDefinitions = Map.empty; ChangeResults = Map.empty }
+        { ChangeResults = Map.empty; EffectResults = Map.empty }
 
-    let change changeId changeDefinition changeResult timeframe =
-        {
-            ChangeDefinitions = Map.add changeId changeDefinition timeframe.ChangeDefinitions
-            ChangeResults = Map.add changeDefinition changeResult timeframe.ChangeResults
-        }
-
-    let tryDefinition changeId timeframe =
-        Map.tryFind changeId timeframe.ChangeDefinitions
-
-    let definition changeId timeframe =
-        match tryDefinition changeId timeframe with
-        | Some definition -> definition
-        | None -> raise (MissingChangeDefinitionException ())
-
-    let result changeId timeframe =
-        timeframe.ChangeResults.[changeId]
-
-    let history headId timeframe =
-        { HeadId = headId; ChangeDefinitions = timeframe.ChangeDefinitions }
+    let changeResult id timeframe =
+        timeframe.ChangeResults.[id]

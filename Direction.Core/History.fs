@@ -2,25 +2,26 @@
 
 open System
 
+// A History is a persistable record of change and effect definitions that
+// can be replayed and turned into a Timeline when given a Director
+// Note that a Director may not agree with the Ids of the Definitions...
+// So it may be preferable to store a History as a Set of Definitions,
+// or even as a graph of Definitions without mentioning Ids, or as
+// serialized results... There are many options, which is why it's good
+// to not couple anything to a specific History format if avoidable.
 type History = {
-    HeadId : ChangeId
     ChangeDefinitions : Map<ChangeId, ChangeDefinition>
+    EffectDefinitions : Map<EffectId, EffectDefinition>
 }
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module History =
     let empty =
-        { HeadId = ChangeId.empty; ChangeDefinitions = Map.empty }
+        { ChangeDefinitions = Map.empty; EffectDefinitions = Map.empty }
 
-    let change changeId changeDefinition history =
-        { HeadId = changeId; ChangeDefinitions = Map.add changeId changeDefinition history.ChangeDefinitions }
+    //let change changeDefinition history =
+    //    let changeId = ChangeDefinition.id changeDefinition
+    //    { ChangeDefinitions = Map.add changeId changeDefinition history.ChangeDefinitions }
 
-    let definition changeId history =
+    let changeDefinition changeId history =
         history.ChangeDefinitions.[changeId]
-
-    let head history =
-        definition history.HeadId
-
-    //let revise revisionId revision history : History =
-    //    let revisionGraph = RevisionGraph.add revisionId revision history.RevisionGraph
-    //    { Head = revisionId; RevisionGraph = revisionGraph }

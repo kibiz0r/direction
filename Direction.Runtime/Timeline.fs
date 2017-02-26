@@ -2,9 +2,14 @@
 
 open System
 
+// A Timeline specifies a particular Director, and caches the Directives
+// associated with a particular ChangeId.
+// 
+// The cached Directives were not necessarily evaluated using the same
+// Director, but their Ids were computed using this Timeline's Director.
 type Timeline = {
-    HeadId : ChangeId
-    Timeframe : Timeframe
+    Director : IDirector
+    Directives : Map<ChangeId, IDirective>
 }
 
 //type Timeline (history : History, processor : ITimelineProcessor) =

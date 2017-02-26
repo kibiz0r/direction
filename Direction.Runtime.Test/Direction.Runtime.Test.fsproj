@@ -54,12 +54,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FSharpDirectorTest.fs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Direction.Core\Direction.Core.fsproj">
       <Project>{C7D1772B-2FA0-456C-9EDF-B66BC349EB61}</Project>
       <Name>Direction.Core</Name>
@@ -68,6 +62,11 @@
       <Project>{4F64D493-4D46-4935-816A-C33F593FB507}</Project>
       <Name>Direction.Runtime</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="FSharpDirectorTest.fs" />
+    <Compile Include="TimelineBuilderTest.fs" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(FSharpTargetsPath)" />
 </Project>

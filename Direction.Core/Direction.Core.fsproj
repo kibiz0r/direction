@@ -43,14 +43,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="ChangeId.fs" />
     <Compile Include="ChangeDefinition.fs" />
     <Compile Include="EffectDefinition.fs" />
     <Compile Include="History.fs" />
     <Compile Include="ChangeResult.fs" />
+    <Compile Include="EffectResult.fs" />
     <Compile Include="MissingChangeDefinitionException.fs" />
     <Compile Include="Timeframe.fs" />
-    <Compile Include="Timeline.fs" />
   </ItemGroup>
   <Import Project="$(FSharpTargetsPath)" />
 </Project>

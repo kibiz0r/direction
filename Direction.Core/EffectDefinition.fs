@@ -7,3 +7,5 @@ open Divination
 type EffectDefinition = {
     Identity : Identity
 }
+
+type EffectId = int

@@ -4,7 +4,11 @@ open System
 open Direction.Core
 open FSharp.Quotations
 
-type Directive<'T> (director : IDirector, change : Change<'T>) =
+type Directive<'T> (id : ChangeId, definition : ChangeDefinition, timeframe : Timeframe) =
+    interface IDirective<'T> with
+        member this.Id = id
+        member this.Definition = definition
+        member this.Timeframe = timeframe
     let id = change.Id
     let timeline = change.Timeline
     let timeframe = change.Timeframe

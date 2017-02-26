@@ -44,11 +44,12 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Change.fs" />
-    <Compile Include="IDirector.fs" />
     <Compile Include="Enactment.fs" />
+    <Compile Include="IDirective.fs" />
     <Compile Include="Directive.fs" />
     <Compile Include="TimelineDiviner.fs" />
     <Compile Include="FSharpDirector.fs" />
+    <Compile Include="IDirector.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Direction.Core\Direction.Core.fsproj">
