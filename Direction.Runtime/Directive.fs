@@ -4,36 +4,33 @@ open System
 open Direction.Core
 open FSharp.Quotations
 
-type Directive<'T> (id : ChangeId, definition : ChangeDefinition, timeframe : Timeframe) =
-    interface IDirective<'T> with
+type Directive (id : ChangeId, definition : ChangeDefinition, timeframe : Timeframe) =
+    interface IDirective with
         member this.Id = id
         member this.Definition = definition
         member this.Timeframe = timeframe
-    let id = change.Id
-    let timeline = change.Timeline
-    let timeframe = change.Timeframe
-    let definition = change.Definition
-    let result = change.Result
 
-    member this.Director = director
-    member this.Change = change
+type Directive<'T> (id : ChangeId, definition : ChangeDefinition, timeframe : Timeframe) =
+    inherit Directive (id, definition, timeframe)
+    interface IDirective<'T>
 
-    member this.Id = id
-    member this.Timeline = timeline
-    member this.Timeframe = timeframe
-    member this.Definition = definition
-    member this.Result = result
+[<AutoOpen; CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
+module Directive =
+    type IDirective with
+        member this.Result : ChangeResult =
+            Timeframe.changeResult this.Id this.Timeframe
 
-    member this.Value = change.Value
+        member this.Value : obj =
+            match this.Result with
+            | ChangeSuccess (obj, _) ->
+                obj
+            | ChangeFailure e ->
+                raise e
 
-    static member EnactDefinition (director : IDirector, timeframe : Timeframe, changeId : ChangeId, changeDefinition : ChangeDefinition) : Directive<'T> =
-        let change = director.Change (timeframe, changeId, changeDefinition)
-        Directive<'T> (director, change)
-
-    static member EnactExpr (director : IDirector, changeExpr : Expr<'T>) : Directive<'T> =
-        let timeframe = director.Timeframe (changeExpr)
-        let changeId, changeDefinition = director.ChangeDefinition (changeExpr)
-        Directive.EnactDefinition (director, timeframe, changeId, changeDefinition)
-
-    static member Enact (director : IDirector, [<ReflectedDefinition>] changeExpr : Expr<'T>) : Directive<'T> =
-        Directive.EnactExpr (director, changeExpr)
+    type IDirective<'T> with
+        member this.Value : 'T =
+            match this.Result with
+            | ChangeSuccess (obj, _) ->
+                obj :?> 'T
+            | ChangeFailure e ->
+                raise e

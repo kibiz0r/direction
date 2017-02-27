@@ -4,5 +4,12 @@ open System
 open Direction.Core
 
 type Enactment<'T> () =
-    member this.Evaluate () : 'T * EffectDefinition list =
-        Unchecked.defaultof<'T>, []
+    class
+    end
+
+type EnactmentBuilder () =
+    member this.Return ()
+
+[<AutoOpen; CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
+module Enactment =
+    let enact = EnactmentBuilder ()

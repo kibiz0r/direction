@@ -50,6 +50,7 @@
     <Compile Include="EffectResult.fs" />
     <Compile Include="MissingChangeDefinitionException.fs" />
     <Compile Include="Timeframe.fs" />
+    <Compile Include="Change.fs" />
   </ItemGroup>
   <Import Project="$(FSharpTargetsPath)" />
 </Project>

@@ -2,6 +2,7 @@
 
 open System
 open System.Reflection
+open FSharp.Quotations
 open NUnit.Framework
 open FsUnit
 open Direction.Runtime
@@ -10,7 +11,12 @@ open Divination
 
 [<TestFixture>]
 module FSharpDirectorTest =
-    let director = FSharpDirector () :> IDirector
+    let director = FSharpDirector ()
+
+    let create (ctor : 'T -> 'U) (arguments : 'T) : Enactment<'U> =
+        enact {
+            return ctor arguments
+        }
 
     type CarDoorStatus =
         | CarDoorOpened
@@ -21,8 +27,8 @@ module FSharpDirectorTest =
 
     [<Test>]
     let ``defines creation of a car`` () =
-        let changeId, changeDefinition = director.ChangeDefinition (<@ Car () @>)
-        let expectedChangeDefinition = { ChangeDefinition.Identity = ConstructorIdentity (typeof<Car>.GetConstructor ([||]), []) }
+        let definition = director.Define <@ create Car () @>
+        let expected : ChangeDefinition = { Identity = ConstructorIdentity (typeof<Car>.GetConstructor ([||]), []) }
         changeDefinition |> should equal expectedChangeDefinition
 
     [<Test>]

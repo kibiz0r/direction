@@ -30,47 +30,18 @@ module FSharpIdentity =
         | _ -> expr'.ToString () |> invalidArg "expr'"
 
 type FSharpDirector () =
-    let newChangeId () = ChangeId.random ()
-
-    member this.ChangeResult<'T> (timeframe : Timeframe, changeDefinition : ChangeDefinition) : ChangeResult =
-        try
-            let value, effects =
-                match changeDefinition.Identity with
-                | ConstructorIdentity (:? ConstructorInfo as constructorInfo, arguments) ->
-                    let arguments' =
-                        arguments
-                        |> List.map (fun a -> a :> obj) // divine these
-                        |> List.toArray
-                    let value = constructorInfo.Invoke (arguments') :?> 'T
-                    value, []
-                | CallIdentity (this', (:? MethodInfo as methodInfo), arguments) ->
-                    let this'' = this' // divine this
-                    let arguments' =
-                        arguments
-                        |> List.map (fun a -> a :> obj) // divine these
-                        |> List.toArray
-                    if methodInfo.ReturnType = typeof<Enactment<'T>> then
-                        let enactment = methodInfo.Invoke (this'', arguments') :?> Enactment<'T>
-                        let parameters : Map<string, Identity> = Map.empty // something like this
-                        enactment.Evaluate ()
-                    else
-                        let value = methodInfo.Invoke (this'', arguments') :?> 'T
-                        value, []
-                | _ -> invalidArg "changeDefinition" ""
-            ChangeSuccess (value, effects)
-        with | e -> ChangeFailure e
-
     interface IDirector with
-        member this.Timeframe (changeExpr : Expr) : Timeframe =
+        member this.Id (changeDefinition : ChangeDefinition) =
+            0 : ChangeId
+
+        member this.Id (effectDefinition : EffectDefinition) =
+            0 : EffectId
+
+        member this.Evaluate (change : Change) : ChangeResult =
+            ChangeSuccess (obj (), [])
+
+        member this.Merge (timeframes : Set<Timeframe>) =
             Timeframe.empty
 
-        member this.ChangeDefinition (changeExpr : Expr) : ChangeId * ChangeDefinition =
-            let changeId = newChangeId ()
-            let changeDefinition = { Identity = FSharpIdentity.expr changeExpr }
-            changeId, changeDefinition
-
-        member this.Change<'T> (timeframe : Timeframe, changeId : ChangeId, changeDefinition : ChangeDefinition) : Change<'T> =
-            let changeResult = this.ChangeResult<'T> (timeframe, changeDefinition)
-            let newTimeframe = Timeframe.change changeId changeDefinition changeResult timeframe
-            let timeline = { HeadId = changeId; Timeframe = newTimeframe }
-            Change<'T> (timeline)
+    member this.Define (expr : Expr<Enactment<'T>>) : ChangeDefinition =
+        { Identity = Identifier 0 }
